@@ -1,0 +1,179 @@
+Modulo 1
+
+
+Sub Auto_Open()
+
+    Sheets("Portada").Visible = -1
+    Sheets("Portada").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    Application.ScreenUpdating = False
+    Sheets("DINAMICAS").Visible = -1
+    Sheets("DINAMICAS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("DINAMICAS").Visible = 2
+    Sheets("TABLERO DE CONTROL").Visible = -1
+    Sheets("TABLERO DE CONTROL").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("TABLERO DE CONTROL").Visible = 2
+    Sheets("DB").Visible = -1
+    Sheets("DB").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("DB").Visible = 2
+    Sheets("Usuarios").Visible = -1
+    Sheets("Usuarios").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("Registro").Visible = -1
+    Sheets("Registro").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("Registro").Visible = 2
+    Sheets("LISTAS").Visible = -1
+    Sheets("LISTAS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("LISTAS").Visible = 2
+    Sheets("AUDITORÍA").Visible = -1
+    Sheets("AUDITORÍA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("AUDITORÍA").Visible = 2
+    Sheets("AUDITORÍA_CONS").Visible = -1
+    Sheets("AUDITORÍA_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("AUDITORÍA_CONS").Visible = 2
+    Sheets("CONTABILIDAD").Visible = -1
+    Sheets("CONTABILIDAD").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("CONTABILIDAD").Visible = 2
+    Sheets("CONTABILIDAD_CONS").Visible = -1
+    Sheets("CONTABILIDAD_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("CONTABILIDAD_CONS").Visible = 2
+    Sheets("CONSTRUCCIÓN").Visible = -1
+    Sheets("CONSTRUCCIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("CONSTRUCCIÓN").Visible = 2
+    Sheets("CONSTRUCCIÓN_CONS").Visible = -1
+    Sheets("CONSTRUCCIÓN_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("CONSTRUCCIÓN_CONS").Visible = 2
+    Sheets("TÉCNICA").Visible = -1
+    Sheets("TÉCNICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("TÉCNICA").Visible = 2
+    Sheets("TÉCNICA_CONS").Visible = -1
+    Sheets("TÉCNICA_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("TÉCNICA_CONS").Visible = 2
+    Sheets("HSEQ").Visible = -1
+    Sheets("HSEQ").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("HSEQ").Visible = 2
+    Sheets("HSEQ_CONS").Visible = -1
+    Sheets("HSEQ_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("HSEQ_CONS").Visible = 2
+    Sheets("INNOVACIÓN").Visible = -1
+    Sheets("INNOVACIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("INNOVACIÓN").Visible = 2
+    Sheets("INNOVACIÓN_CONS").Visible = -1
+    Sheets("INNOVACIÓN_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("INNOVACIÓN_CONS").Visible = 2
+    Sheets("JURÍDICA").Visible = -1
+    Sheets("JURÍDICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("JURÍDICA").Visible = 2
+    Sheets("JURÍDICA_CONS").Visible = -1
+    Sheets("JURÍDICA_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("JURÍDICA_CONS").Visible = 2
+    Sheets("LICITACIONES").Visible = -1
+    Sheets("LICITACIONES").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("LICITACIONES").Visible = 2
+    Sheets("LICITACIONES_CONS").Visible = -1
+    Sheets("LICITACIONES_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("LICITACIONES_CONS").Visible = 2
+    Sheets("LOGÍSTICA").Visible = -1
+    Sheets("LOGÍSTICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("LOGÍSTICA").Visible = 2
+    Sheets("LOGÍSTICA_CONS").Visible = -1
+    Sheets("LOGÍSTICA_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("LOGÍSTICA_CONS").Visible = 2
+    Sheets("MAQ_EQUIPOS").Visible = -1
+    Sheets("MAQ_EQUIPOS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("MAQ_EQUIPOS").Visible = 2
+    Sheets("MAQ_EQUIPOS_CONS").Visible = -1
+    Sheets("MAQ_EQUIPOS_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("MAQ_EQUIPOS_CONS").Visible = 2
+    Sheets("PLANEACIÓN").Visible = -1
+    Sheets("PLANEACIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PLANEACIÓN").Visible = 2
+    Sheets("PLANEACIÓN_CONS").Visible = -1
+    Sheets("PLANEACIÓN_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PLANEACIÓN_CONS").Visible = 2
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Visible = -1
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Visible = 2
+    Sheets("PRESIDENCIA_ADMON_CONS").Visible = -1
+    Sheets("PRESIDENCIA_ADMON_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PRESIDENCIA_ADMON_CONS").Visible = 2
+    Sheets("PRESIDENCIA_COMERCIAL").Visible = -1
+    Sheets("PRESIDENCIA_COMERCIAL").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PRESIDENCIA_COMERCIAL").Visible = 2
+    Sheets("PRESIDENCIA_COMERCIAL_CONS").Visible = -1
+    Sheets("PRESIDENCIA_COMERCIAL_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("PRESIDENCIA_COMERCIAL_CONS").Visible = 2
+    Sheets("RRHH").Visible = -1
+    Sheets("RRHH").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("RRHH").Visible = 2
+    Sheets("RRHH_CONS").Visible = -1
+    Sheets("RRHH_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("RRHH_CONS").Visible = 2
+    Sheets("TESORERÍA").Visible = -1
+    Sheets("TESORERÍA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("TESORERÍA").Visible = 2
+    Sheets("TESORERÍA_CONS").Visible = -1
+    Sheets("TESORERÍA_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("TVG").Visible = 2
+    Sheets("TVG_CONS").Visible = -1
+    Sheets("TVG_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Sheets("AMBIENTAL").Visible = 2
+    Sheets("AMBIENTAL_CONS").Visible = -1
+    Sheets("AMBIENTAL_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    Sheets("SOCIAL").Visible = 2
+    Sheets("SOCIAL_CONS").Visible = -1
+    Sheets("SOCIAL_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Sheets("SOSTENIBILIDAD").Visible = 2
+    Sheets("SOSTENIBILIDAD_CONS").Visible = -1
+    Sheets("SOSTENIBILIDAD_CONS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    
+    Sheets("TESORERÍA_CONS").Visible = 2
+        
+    Sheets("Portada").Select
+    Range("A1").Select
+    Application.ScreenUpdating = True
+    UserForm1.Show
+    
+End Sub

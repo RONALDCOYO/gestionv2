@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Correspondencia</title>
+</head>
+<body>
+    <h1>Control de Correspondencia</h1>
+
+    <!-- Formulario para agregar correspondencia -->
+    <h2>Registrar Correspondencia</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Registrar</button>
+    </form>
+
+    <!-- Lista de correspondencia -->
+    <h2>Correspondencia Registrada</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Consecutivo</th>
+                <th>Tipo</th>
+                <th>Dependencia</th>
+                <th>Entrada/Salida</th>
+                <th>Fecha</th>
+                <th>Documento</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for correspondencia in correspondencias %}
+                <tr>
+                    <td>{{ correspondencia.consecutivo }}</td>
+                    <td>{{ correspondencia.tipo }}</td>
+                    <td>{{ correspondencia.dependencia.nombre }}</td>
+                    <td>{{ correspondencia.entrada_salida }}</td>
+                    <td>{{ correspondencia.fecha }}</td>
+                    <td>
+                        <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
+                        <a href="{% url 'crear_dependencia' %}">Agregar Dependencia</a>
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
