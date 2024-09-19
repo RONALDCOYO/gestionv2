@@ -1,0 +1,197 @@
+Sub Ir_Sostenibilidad()
+    
+    Sheets("SOSTENIBILIDAD").Select
+
+End Sub
+Sub Ir_Sostenibilidad_CONS()
+    
+    Sheets("SOSTENIBILIDAD_CONS").Select
+
+End Sub
+
+Sub Ir_SOCIAL()
+    
+    Sheets("SOCIAL").Select
+
+End Sub
+Sub Ir_Social_CONS()
+    
+    Sheets("SOCIAL_CONS").Select
+
+End Sub
+
+
+Sub Ir_Ambiental()
+    
+    Sheets("AMBIENTAL").Select
+
+End Sub
+Sub Ir_Ambiental_CONS()
+    
+    Sheets("AMBIENTAL_CONS").Select
+
+End Sub
+
+Sub Ir_Tvg()
+    
+    Sheets("TVG").Select
+
+End Sub
+Sub Ir_Tvg_CONS()
+    
+    Sheets("TVG_CONS").Select
+
+End Sub
+
+Sub Ir_Auditoria()
+    
+    Sheets("AUDITORÍA").Select
+
+End Sub
+Sub Ir_Auditoria_Cons()
+    
+    Sheets("AUDITORÍA_CONS").Select
+
+End Sub
+Sub Ir_Contabilidad()
+    
+    Sheets("CONTABILIDAD").Select
+
+End Sub
+Sub Ir_Contabilidad_Cons()
+    
+    Sheets("CONTABILIDAD_CONS").Select
+
+End Sub
+Sub Ir_Construccion()
+    
+    Sheets("CONSTRUCCIÓN").Select
+
+End Sub
+Sub Ir_Construccion_Cons()
+    
+    Sheets("CONSTRUCCIÓN_CONS").Select
+
+End Sub
+Sub Ir_Ger_Tecnica()
+    
+    Sheets("TÉCNICA").Select
+
+End Sub
+Sub Ir_Ger_Tecnica_Cons()
+    
+    Sheets("TÉCNICA_CONS").Select
+
+End Sub
+Sub Ir_HSEQ()
+    
+    Sheets("HSEQ").Select
+
+End Sub
+Sub Ir_HSEQ_Cons()
+    
+    Sheets("HSEQ_CONS").Select
+
+End Sub
+Sub Ir_Innovacion()
+    
+    Sheets("INNOVACIÓN").Select
+
+End Sub
+Sub Ir_Innovacion_Cons()
+    
+    Sheets("INNOVACIÓN_CONS").Select
+
+End Sub
+Sub Ir_Juridica()
+    
+    Sheets("JURÍDICA").Select
+
+End Sub
+Sub Ir_Juridica_Cons()
+    
+    Sheets("JURÍDICA_CONS").Select
+
+End Sub
+Sub Ir_Licitaciones()
+    
+    Sheets("LICITACIONES").Select
+
+End Sub
+Sub Ir_Licitaciones_Cons()
+    
+    Sheets("LICITACIONES_CONS").Select
+
+End Sub
+Sub Ir_Logistica()
+    
+    Sheets("LOGÍSTICA").Select
+
+End Sub
+Sub Ir_Logistica_Cons()
+    
+    Sheets("LOGÍSTICA_CONS").Select
+
+End Sub
+Sub Ir_Maq_Equipos()
+    
+    Sheets("MAQ_EQUIPOS").Select
+
+End Sub
+Sub Ir_Maq_Equipos_Cons()
+    
+    Sheets("MAQ_EQUIPOS_CONS").Select
+
+End Sub
+Sub Ir_Planeacion()
+    
+    Sheets("PLANEACIÓN").Select
+
+End Sub
+Sub Ir_Planeacion_Cons()
+    
+    Sheets("PLANEACIÓN_CONS").Select
+
+End Sub
+Sub Ir_Pres_Admon()
+    
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+
+End Sub
+Sub Ir_Pres_Admon_Cons()
+    
+    Sheets("PRESIDENCIA_ADMON_CONS").Select
+
+End Sub
+Sub Ir_Pres_Comerc()
+    
+    Sheets("PRESIDENCIA_COMERCIAL").Select
+
+End Sub
+Sub Ir_Pres_Comerc_Cons()
+    
+    Sheets("PRESIDENCIA_COMERCIAL_CONS").Select
+
+End Sub
+Sub Ir_RRHH()
+    
+    Sheets("RRHH").Select
+
+End Sub
+Sub Ir_RRHH_Cons()
+    
+    Sheets("RRHH_CONS").Select
+
+End Sub
+Sub Ir_TESORERIA()
+    
+    Sheets("TESORERÍA").Select
+
+End Sub
+Sub Ir_TESORERIA_Cons()
+    
+    Sheets("TESORERÍA_CONS").Select
+
+End Sub
+
+

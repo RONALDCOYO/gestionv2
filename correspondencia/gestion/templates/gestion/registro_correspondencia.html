@@ -22,6 +22,7 @@
         {% endif %}
 
         <button type="submit">Registrar</button>
+       
     </form>
 
     <!-- Lista de correspondencia -->
@@ -51,9 +52,12 @@
                 </tr>
             {% empty %}
                 <tr>
+                   
                     <td colspan="6">No hay correspondencia registrada para {{ empresa.nombre }}.</td>
                 </tr>
             {% endfor %}
+
+          
         </tbody>
     </table>
 
@@ -61,6 +65,10 @@
     {% if user.is_superuser %}
         <br>
         <a href="{% url 'crear_dependencia' %}">Agregar Dependencia</a>
+        
     {% endif %}
+
+    <!-- Cerrar sesión -->
+    <a href="{% url 'logout' %}"><button>Cerrar Sesión</button></a>
 </body>
 </html>

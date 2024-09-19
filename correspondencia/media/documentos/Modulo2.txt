@@ -1,0 +1,2206 @@
+
+Sub GUARDAR()
+'
+' GUARDAR Macro
+'
+
+    Dim Unid As String
+    Dim Check_list As String
+    Dim ContaGral As Integer
+    Check_list = ""
+    
+' *** Se verifica que todos los campos estén diligenciados ***
+
+    Sheets("Registro").Select
+    Empresa = Range("D9").Value
+    Tipo = Range("D11").Value
+    Flujo = Range("D13").Value
+    Radicado = Range("D15").Value
+    Area = Range("D17").Value
+    Proyecto = Range("D19").Value
+    Asunto = Range("D21").Value
+    Remitente = Range("D23").Value
+    Destinatario = Range("D25").Value
+    Entidad = Range("D27").Value
+    Fecha = Range("D29").Value
+    Rta = Range("D31").Value
+     
+    If Range("H33").Value = "" And Range("H34").Value = "" And Range("H35").Value = "" And Range("H36").Value = "" And Range("H37").Value = "" And Range("H38").Value = "" And Range("H39").Value = "" And Range("H40").Value = "" Then
+        Check_list = "NO"
+        Else
+            Check_list = "OK"
+    End If
+
+If Empresa = "" Or Tipo = "" Or Flujo = "" Or Radicado = "" Or Area = "" Or Proyecto = "" Or Asunto = "" Or Remitente = "" Or Destinatario = "" Or Entidad = "" Or Fecha = "" Or Rta = "" Or Check_list = "NO" Then
+    MsgBox "Verifique que todos los campos estén diligenciados", , "GRD Alertas"
+    
+        
+' *** Se determina a cuál área interna corresponde la comunicación ***
+        
+        Else
+            Sheets("Registro").Select
+            Unid = Range("D17").Value ' en D17 se encuentra la referencia para el filtro del área interna
+
+
+' *** Se procesa la información para el área de Auditoría Interna ***
+
+    If Unid = "AUDITORÍA INTERNA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("AUDITORÍA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("AUDITORÍA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("AUDITORÍA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],AUDITORÍA_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+                
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("AUDITORÍA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("AUDITORÍA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+    
+ ' *** Se procesa la información para el área de Ambiental ***
+
+    If Unid = "AMBIENTAL" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("AMBIENTAL").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("AMBIENTAL").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("AMBIENTAL").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],AMBIENTAL_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+                
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("AMBIENTAL").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],AMBIENTAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOSTENIBILIDAD!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],AMBIENTAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOCIAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOSTENIBILIDAD!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],AMBIENTAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOCIAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOSTENIBILIDAD!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("AMBIENTAL").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+        
+    
+    
+
+    End If
+    
+ ' *** Se procesa la información para el área de Social ***
+
+    If Unid = "SOCIAL" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("SOCIAL").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("SOCIAL").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("SOCIAL").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],SOCIAL_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+                
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("SOCIAL").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],AMBIENTAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOSTENIBILIDAD!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],AMBIENTAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOCIAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOSTENIBILIDAD!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],AMBIENTAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOCIAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOSTENIBILIDAD!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("SOCIAL").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+        
+    
+    
+
+    End If
+ 
+ ' *** Se procesa la información para el área de Ambiental ***
+
+    If Unid = "SOSTENIBILIDAD" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("SOSTENIBILIDAD").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("SOSTENIBILIDAD").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("SOSTENIBILIDAD").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja AUDITORÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],SOSTENIBILIDAD_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+                
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("SOSTENIBILIDAD").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],AMBIENTAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],SOSTENIBILIDAD!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],AMBIENTAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOCIAL!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],SOSTENIBILIDAD!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],AMBIENTAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOCIAL!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],SOSTENIBILIDAD!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("SOSTENIBILIDAD").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+        
+    
+    
+
+    End If
+
+' *** Se procesa la información para el área de Contabilidad ***
+
+    If Unid = "CONTABILIDAD" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("CONTABILIDAD").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("CONTABILIDAD").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja CONTABILIDAD
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("CONTABILIDAD").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja CONTABILIDAD
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+              
+              
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],CONTABILIDAD_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+                
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+                
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("CONTABILIDAD").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("CONTABILIDAD").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de la Gerencia Nacional de Construcción ***
+
+    If Unid = "GERENCIA CONSTRUCCIÓN" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("CONSTRUCCIÓN").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("CONSTRUCCIÓN").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja CONSTRUCCIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("CONSTRUCCIÓN").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja CONSTRUCCIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+                
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],CONSTRUCCIÓN_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("CONSTRUCCIÓN").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("CONSTRUCCIÓN").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de la Gerencia Técnica ***
+
+    If Unid = "GERENCIA TÉCNICA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("TÉCNICA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("TÉCNICA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja TÉCNICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("TÉCNICA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja TÉCNICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],TÉCNICA_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("TÉCNICA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("TÉCNICA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+
+' *** Se procesa la información para el área de la HSEQ ***
+
+    If Unid = "HSEQ" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("HSEQ").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("HSEQ").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja HSEQ
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("HSEQ").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja HSEQ
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],HSEQ_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+       
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("HSEQ").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("HSEQ").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+
+' *** Se procesa la información para el área de la Innovación ***
+    
+    If Unid = "INNOVACIÓN" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("INNOVACIÓN").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("INNOVACIÓN").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja INNOVACIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("INNOVACIÓN").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja INNOVACIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],INNOVACIÓN_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("INNOVACIÓN").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("INNOVACIÓN").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+
+' *** Se procesa la información para el área Jurídica ***
+
+    If Unid = "JURÍDICA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("JURÍDICA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("JURÍDICA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja JURÍDICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("JURÍDICA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja JURÍDICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],JURÍDICA_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+       ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("JURÍDICA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("JURÍDICA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Licitaciones ***
+
+    If Unid = "LICITACIONES" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("LICITACIONES").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("LICITACIONES").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja LICITACIONES
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("LICITACIONES").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja LICITACIONES
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],LICITACIONES_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("LICITACIONES").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("LICITACIONES").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Logística ***
+
+    If Unid = "LOGÍSTICA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("LOGÍSTICA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("LOGÍSTICA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja LOGÍSTICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("LOGÍSTICA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja LOGÍSTICA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],LOGÍSTICA_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("LOGÍSTICA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("LOGÍSTICA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Maquinaria & Equipos ***
+
+    If Unid = "MAQ_EQUIPOS" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("MAQ_EQUIPOS").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("MAQ_EQUIPOS").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja MAQ_EQUIPOS
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("MAQ_EQUIPOS").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja MAQ_EQUIPOS
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],MAQ_EQUIPOS_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("MAQ_EQUIPOS").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("MAQ_EQUIPOS").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Planeación ***
+
+    If Unid = "PLANEACIÓN" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("PLANEACIÓN").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("PLANEACIÓN").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PLANEACIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("PLANEACIÓN").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PLANEACIÓN
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],PLANEACIÓN_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("PLANEACIÓN").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("PLANEACIÓN").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Presidencia Administrativa ***
+
+    If Unid = "PRESIDENCIA ADMINISTRATIVA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PRESIDENCIA_ADMINISTRATIVA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PRESIDENCIA_ADMINISTRATIVA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],PRESIDENCIA_ADMON_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Presidencia Comercial ***
+
+    If Unid = "PRESIDENCIA COMERCIAL" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("PRESIDENCIA_COMERCIAL").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("PRESIDENCIA_COMERCIAL").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PRESIDENCIA_COMERCIAL
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("PRESIDENCIA_COMERCIAL").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja PRESIDENCIA_COMERCIAL
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],PRESIDENCIA_COMERCIAL_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("PRESIDENCIA_COMERCIAL").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("PRESIDENCIA_COMERCIAL").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+
+' *** Se procesa la información para el área de Recursos Humanos ***
+
+    If Unid = "RRHH" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("RRHH").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("RRHH").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja RRHH
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("RRHH").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja RRHH
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],RRHH_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+        
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("RRHH").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("RRHH").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+    
+' *** Se procesa la información para el área de Tesorería ***
+
+    If Unid = "TESORERÍA" Then
+        
+        Application.ScreenUpdating = False
+        Sheets("Portada").Select
+        ContaGral = Range("N1").Value + 1                                               ' Ejecuta el conteo de la generación de memos o consecutivos
+        Range("N1").Value = ContaGral
+        Sheets("TESORERÍA").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("9:9").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Range("A9").Select                                                              ' Se procesa el código del programador para pegar como sólo valores
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[-2]C[3],""-"",Portada!R[-8]C[13])"
+        Range("A9").Select
+        Selection.Copy
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D9,D11,D13,D15").Select                                                  ' Se seleccionan las celdas que contienen información
+        Range("D15").Activate
+        Selection.Copy
+        Sheets("TESORERÍA").Select
+        Range("B9:E9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja TESORERÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        Sheets("Registro").Select
+        Range("D17,D19,D21,D23,D25,D27,D29,D31").Select                                 ' Se seleccionan las celdas que contienen información
+        Range("D31").Activate
+        Selection.Copy
+        Sheets("TESORERÍA").Select
+        Range("G9:N9").Select                                                           ' Se procede a pegar la información en la primera fila habilitada de la hoja TESORERÍA
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=True
+        Application.CutCopyMode = False
+        
+        ' *** Se procede a aplicar las fórmulas que determinan las condiciones de cumplimiento ***
+        
+        Range("O9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=CONCATENATE(Registro!R[24]C[-3],Registro!R[26]C[-6],"" - "",Registro!R[25]C[-3],"" - "",Registro!R[26]C[-3],"" - "",Registro!R[27]C[-3],"" - "",Registro!R[28]C[-3],"" - "",Registro!R[29]C[-3],"" - "",Registro!R[30]C[-3],"" - "",Registro!R[31]C[-3])"
+        Range("O9").Select
+        Selection.Copy                                                                  ' Se procede a pegar sólo valores teniendo en cuenta que los valores de la hoja Registro se borran al final de la rutina
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        Range("R9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-4]=""NO"",""NO APLICA"",IF(OR(RC[-2]="""",RC[-1]=""""),""PENDIENTE"",""OK""))"
+        Range("S9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[5]<>""ERROR"",IF(RC[5]=""NA"",""COMUNICACIÓN ENTRANTE NO APLICA PARA EL CONSECUTIVO INTERNO"",""ENTREGADO""),""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR"")"
+        Range("T9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(OR(RC[-2]=""PENDIENTE"",RC[-1]=""EL # DE RADICADO NO COINCIDE O AÚN ESTÁ PENDIENTE POR GESTIONAR""),""PENDIENTE"",""COMPLETADO"")"
+        Range("W9").Select
+        ActiveCell.FormulaR1C1 = _
+        "=IF(RC[-19]=""SALIENTE"",VLOOKUP(RC[-18],TESORERÍA_CONS!C[-21],1,0),""NA"")"
+        Range("X9").Select
+        ActiveCell.FormulaR1C1 = "=IFERROR(RC[-1],""ERROR"")"
+        
+        ' *** Se procede a dar formato a las celdas que lo requieren ***
+        
+        Formato
+
+        ' *** Se procede a limpiar los parámetros iniciales para proceder con un nuevo registro ***
+        
+        Limpieza_registro
+        
+        ' *** Se incluye el registro en la base de datos general ***
+               
+        Sheets("DB").Select
+        ActiveSheet.Unprotect ("Nacional1205")                                          ' Desprotege la hoja para poder desbloquear las celdas requeridas
+        Rows("3:3").Select
+        Selection.Insert Shift:=xlDown, CopyOrigin:=xlFormatFromRightOrBelow
+        Sheets("TESORERÍA").Select
+        Range("A9:T9").Select
+        Selection.Copy
+        Sheets("DB").Select
+        Range("A3").Select
+        Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+            :=False, Transpose:=False
+        
+        Range("U3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-20],AUDITORÍA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONTABILIDAD!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],CONSTRUCCIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],TÉCNICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],HSEQ!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],INNOVACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],JURÍDICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],L" & _
+            "ICITACIONES!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],LOGÍSTICA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],MAQ_EQUIPOS!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PLANEACIÓN!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_ADMINISTRATIVA!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],PRESIDENCIA_COMERCIAL!C[-20]:C,18,0),IFERROR(VLOOKUP(RC[-20],RRHH!C[-20]:C,18,0),VLOOKUP(RC[-20],TESO" & _
+            "RERÍA!C[-20]:C,18,0)))))))))))))))" & _
+            ""
+        Range("V3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-21],AUDITORÍA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONTABILIDAD!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],CONSTRUCCIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],TÉCNICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],HSEQ!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],INNOVACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],JURÍDICA!C[-21]:C[-1],19," & _
+            "0),IFERROR(VLOOKUP(RC[-21],LICITACIONES!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],LOGÍSTICA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],MAQ_EQUIPOS!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PLANEACIÓN!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_ADMINISTRATIVA!C[-21]:C[-1],19,0),IFERROR(VLOOKUP(RC[-21],PRESIDENCIA_COMERCIAL!C[-21]:C[-1],19,0),IFERROR(VLOO" & _
+            "KUP(RC[-21],RRHH!C[-21]:C[-1],19,0),VLOOKUP(RC[-21],TESORERÍA!C[-21]:C[-1],19,0)))))))))))))))" & _
+            ""
+        Range("W3").Select
+        ActiveCell.FormulaR1C1 = _
+            "=IFERROR(VLOOKUP(RC[-22],AUDITORÍA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONTABILIDAD!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],CONSTRUCCIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],TÉCNICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],HSEQ!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],INNOVACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],JURÍDICA!C[-22]:C[-2],20," & _
+            "0),IFERROR(VLOOKUP(RC[-22],LICITACIONES!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],LOGÍSTICA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],MAQ_EQUIPOS!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PLANEACIÓN!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_ADMINISTRATIVA!C[-22]:C[-2],20,0),IFERROR(VLOOKUP(RC[-22],PRESIDENCIA_COMERCIAL!C[-22]:C[-2],20,0),IFERROR(VLOO" & _
+            "KUP(RC[-22],RRHH!C[-22]:C[-2],20,0),VLOOKUP(RC[-22],TESORERÍA!C[-22]:C[-2],20,0)))))))))))))))" & _
+            ""
+            
+        ActiveSheet.Protect ("Nacional1205")
+        
+        ' *** Se termina la rutina en la hoja que corresponde al área interna para que el Gestor pueda confirmar el registro correcto de los datos ***
+        
+        Sheets("TESORERÍA").Select
+        ActiveSheet.Protect ("Nacional1205"), DrawingObjects:=True, Contents:=True, Scenarios:=True, AllowInsertingHyperlinks:=True
+        Range("F9").Select
+        
+        ActiveWorkbook.Save
+        Application.ScreenUpdating = True
+    
+        MsgBox "Registro de correspondencia guardado exitosamente", , "GRD Avisos"
+    
+    End If
+    
+End If
+
+End Sub

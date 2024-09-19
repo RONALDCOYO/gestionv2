@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 
 
 urlpatterns = [
+    path('login/', auth_views.LoginView.as_view(template_name='registro/inicio de sesión.html'), name='login'),
     path('admin/', admin.site.urls),
     path('', include('gestion.urls')),  # Incluir las URLs de la app 'gestion'
     path('login/', auth_views.LoginView.as_view(), name='login'),

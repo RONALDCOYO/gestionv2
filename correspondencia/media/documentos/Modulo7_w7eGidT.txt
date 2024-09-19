@@ -1,0 +1,861 @@
+Sub EviarEmail_Auditoria()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("AUDITORÍA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Auditoría Interna"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "german.diaz@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Auditoría Interna"
+    .Body = "Respetad@ responsable de Auditoría Interna," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    Sheets("AUDITORÍA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+Sub EviarEmail_Construccion()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("CONSTRUCCIÓN").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Gerencia Nal de Construcción"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "marco.barros@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Gerencia Nal de Construcción"
+    .Body = "Respetad@ responsable de la Gerencia Nacional de Construcción," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("CONSTRUCCIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_Logistica()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("LOGÍSTICA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Logística"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "luzmila.fernandez@grodco.com.co"
+    .CC = "luis.calderon@grodco.com.co"
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Logística"
+    .Body = "Respetad@ responsable de Logística," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("LOGÍSTICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_Planeacion()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("PLANEACIÓN").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Planeación"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "hector.gualteros@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Planeación"
+    .Body = "Respetad@ responsable de Planeación," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("PLANEACIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_PresAdmin()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Presidencia Administrativa"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "jacky.caviedes@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Presidencia Administrativa"
+    .Body = "Respetad@ responsable de Presidencia Administrativa," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("PRESIDENCIA_ADMINISTRATIVA").Select
+    ActiveSheet.Protect ("Nacional1205")
+        
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_PresComer()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("PRESIDENCIA_COMERCIAL").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Presidencia Comercial"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "jacky.caviedes@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Presidencia Comercial"
+    .Body = "Respetad@ responsable de Presidencia Comercial," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("PRESIDENCIA_COMERCIAL").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_Tecnica()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("TÉCNICA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Gerencia Técnica"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "cesar.colegial@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Gerencia Técnica"
+    .Body = "Respetad@ responsable de la Gerencia Técnica," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("TÉCNICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+    
+End Sub
+Sub EviarEmail_Contabilidad()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("CONTABILIDAD").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Contabilidad"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "nidia.cardenas@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Contabilidad"
+    .Body = "Respetad@ responsable de Contabilidad," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("CONTABILIDAD").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_HSEQ()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("HSEQ").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - HSEQ"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "carlos.cruz@grodco.com.co"
+    .CC = "natalia.chaparro@grodco.com.co"
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // HSEQ"
+    .Body = "Respetad@ responsable de HSEQ," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("HSEQ").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_Innovacion()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("INNOVACIÓN").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Innovación"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "william.cortes@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Innovación"
+    .Body = "Respetad@ responsable de Innovación y Tecnología," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("INNOVACIÓN").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_Juridica()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("JURÍDICA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Jurídica"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "camilo.castro@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Jurídica"
+    .Body = "Respetad@ responsable del área Jurídica," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("JURÍDICA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_MaqEquipos()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("MAQ_EQUIPOS").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Maquinaria & Equipos"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "jhon.cabrera@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Maquinaria & Equipos"
+    .Body = "Respetad@ responsable de Maquinaria & Equipos," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("MAQ_EQUIPOS").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_RRHH()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("RRHH").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Gestión Humana"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "luzmila.fernandez@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Gestión Humana"
+    .Body = "Respetad@ responsable de Gestión Humana," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("RRHH").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_Tesoreria()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("TESORERÍA").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Tesorería"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "jadeyi.ortiz@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Tesorería"
+    .Body = "Respetad@ responsable de Tesorería," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("TESORERÍA").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub
+
+Sub EviarEmail_Licitaciones()
+'
+Dim NombreArchivo As String
+Dim RutaTemporal As String
+Dim Mensaje As String
+Dim OLApp As Outlook.Application
+Dim OLMail As Object
+
+    '
+    Application.ScreenUpdating = False
+    Sheets("LICITACIONES").Select
+    ActiveSheet.Unprotect ("Nacional1205")
+    
+    NombreArchivo = "Correspondencia pendiente - Licitaciones"
+    '
+    RutaTemporal = Environ("temp") & "\"
+    NombreArchivo = RutaTemporal & NombreArchivo & ".xlsx"
+
+    ActiveWorkbook.ActiveSheet.Copy
+    Range("A1:AA100000").Select
+    Selection.Copy
+    Selection.PasteSpecial Paste:=xlPasteValues, Operation:=xlNone, SkipBlanks _
+        :=False, Transpose:=False
+    Application.CutCopyMode = False
+    Range("A9").Select
+    Application.DisplayAlerts = False
+    ActiveWorkbook.SaveAs NombreArchivo
+    Application.DisplayAlerts = True
+    
+    Set OLApp = New Outlook.Application
+    Set OLMail = OLApp.CreateItem(0)
+    OLApp.Session.Logon
+    
+    With OLMail
+    .To = "luis.marulanda@grodco.com.co"
+    .CC = ""
+    .BCC = ""
+    .Subject = "Correspondencia pendiente por gestionar // Licitaciones"
+    .Body = "Respetad@ responsable de Licitaciones," + Chr(13) + Chr(13) + "Se le notifica que tiene correspondencia pendiente por gestionar." + Chr(13) + "Por favor tramitar lo más pronto posible para garantizar una correcta gestión documental en la compañía." + Chr(13) + Chr(13) + "Atentamente," + Chr(13) + Chr(13) + "SISTEMA DE GESTIÓN DE CORRESPONDENCIA - GRODCO"
+    .Attachments.Add (NombreArchivo)
+    .Display
+    End With
+    
+    ActiveWorkbook.Close False
+    Kill NombreArchivo
+    '
+    Set OLMail = Nothing
+    Set OLApp = Nothing
+    '
+    
+    Sheets("LICITACIONES").Select
+    ActiveSheet.Protect ("Nacional1205")
+    
+    Application.ScreenUpdating = True
+    Sheets("Registro").Select
+
+End Sub

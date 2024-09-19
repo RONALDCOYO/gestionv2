@@ -1,0 +1,51 @@
+Sub Limpieza_registro()
+'
+' Limpieza_registro
+'
+
+'
+        Sheets("Registro").Select
+        Range("D9").Select
+        Selection.ClearContents
+        Range("D11").Select
+        Selection.ClearContents
+        Range("D13").Select
+        Selection.ClearContents
+        Range("D15").Select
+        Selection.ClearContents
+        Range("D17").Select
+        Selection.ClearContents
+        Range("D19").Select
+        Selection.ClearContents
+        Range("D21").Select
+        Selection.ClearContents
+        Range("D23").Select
+        Selection.ClearContents
+        Range("D25").Select
+        Selection.ClearContents
+        Range("D27").Select
+        Selection.ClearContents
+        Range("D29").Select
+        Selection.ClearContents
+        Range("D31").Select
+        Selection.ClearContents
+        Range("H33").Select
+        Selection.ClearContents
+        Range("H34").Select
+        Selection.ClearContents
+        Range("H35").Select
+        Selection.ClearContents
+        Range("I35").Select
+        Selection.ClearContents
+        Range("H36").Select
+        Selection.ClearContents
+        Range("H37").Select
+        Selection.ClearContents
+        Range("H38").Select
+        Selection.ClearContents
+        Range("H39").Select
+        Selection.ClearContents
+        Range("H40").Select
+        Selection.ClearContents
+        
+End Sub

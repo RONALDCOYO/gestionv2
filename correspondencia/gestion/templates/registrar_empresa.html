@@ -3,14 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Iniciar sesión</title>
+    <title>Registrar Empresa</title>
 </head>
 <body>
-    <h1>Iniciar sesión</h1>
-    <form method="post">
+    <h1>Registrar Nueva Empresa</h1>
+    
+    <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Ingresar</button>
+        <button type="submit">Registrar Empresa</button>
     </form>
 </body>
 </html>

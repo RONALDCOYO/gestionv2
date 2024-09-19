@@ -91,6 +91,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 
+
+LOGIN_REDIRECT_URL = 'portada'  # Cambia esto por el URL de tu módulo de registro de correspondencia
+LOGOUT_REDIRECT_URL = '/login/'  # o cualquier otra URL a la que quieras redirigir
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
