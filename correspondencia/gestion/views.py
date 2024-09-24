@@ -2,9 +2,11 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, authenticate, logout
+from django.core.files.storage import default_storage
 from .models import Correspondencia, PerfilUsuario, Empresa
-from .forms import RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm
+from .forms import RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm
 from django.contrib.auth.models import User
+from django.contrib import messages
 
 
 # Vista de la página principal (portada)
@@ -37,6 +39,8 @@ def registrar_empresa(request):
 # Vista para registrar correspondencia (disponible para todos los usuarios)
 from django.core.exceptions import ObjectDoesNotExist
 
+
+
 @login_required
 def registro_correspondencia(request):
     try:
@@ -46,17 +50,21 @@ def registro_correspondencia(request):
         if request.user.is_superuser:
             empresa = None
         else:
-            return redirect('error')  # Manejar error si el perfil no existe
+            # Redirigir a una página de error o mostrar un mensaje si el perfil no existe.
+            return redirect('error')  # Asegúrate de que 'error' esté definido en tus URL
 
-    correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa)
-
+    # Si la solicitud es POST, se procesa el formulario
     if request.method == 'POST':
-        form = CorrespondenciaForm(request.POST, request.FILES, user=request.user)  # Pasar el usuario al formulario
+        form = CorrespondenciaForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             nueva_correspondencia = form.save(commit=False)
             nueva_correspondencia.user = request.user
 
-            # Generar consecutivo
+            # Manejo del documento
+            if 'documento' in request.FILES:
+                nueva_correspondencia.documento = request.FILES['documento']
+
+            # Generar el consecutivo
             empresa_codigo = nueva_correspondencia.dependencia.empresa.codigo
             dependencia_codigo = nueva_correspondencia.dependencia.codigo
             año = nueva_correspondencia.fecha.year
@@ -66,29 +74,68 @@ def registro_correspondencia(request):
             ).count() + 1
             consecutivo = f"{empresa_codigo}-{dependencia_codigo}-{año}-{ultimo_consecutivo}"
             nueva_correspondencia.consecutivo = consecutivo
-            
+
             nueva_correspondencia.save()
+
+            # Mensaje de éxito
+            from django.contrib import messages
+            messages.success(request, "La correspondencia ha sido registrada con éxito.")
+
             return redirect('registro_correspondencia')
     else:
-        form = CorrespondenciaForm(user=request.user)  # Pasar el usuario al formulario
+        # Si la solicitud es GET, se muestra el formulario vacío
+        form = CorrespondenciaForm(user=request.user)
 
+    # Obtener las correspondencias para mostrar en la lista
+    if request.user.is_superuser:
+        correspondencias = Correspondencia.objects.all().order_by('-fecha')
+    else:
+        correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa).order_by('-fecha')
+
+    # Retornar la respuesta asegurándote de que siempre haya un render
     return render(request, 'gestion/registro_correspondencia.html', {
         'form': form,
-        'correspondencias': correspondencias
+        'correspondencias': correspondencias,
+        'empresa': empresa
     })
 
+
+   
 # Vista para lista la correspondencia
 
-@login_required
+@user_passes_test(lambda u: u.is_superuser)
 def lista_correspondencia(request):
-    if request.user.is_superuser:
-        correspondencias = Correspondencia.objects.all()  # Mostrar todas las correspondencias
+    correspondencias = Correspondencia.objects.all()
+    context = []
+
+    for correspondencia in correspondencias:
+        # Verificar si la correspondencia tiene un documento asociado
+        if correspondencia.documento:
+            documento_url = correspondencia.documento.url  # Obtener URL si existe
+        else:
+            documento_url = None  # Asignar None si no hay documento
+
+        context.append({
+            'correspondencia': correspondencia,
+            'documento_url': documento_url,  # Pasar la URL o None
+        })
+
+    return render(request, 'lista_correspondencia.html', {'correspondencias': context})
+
+
+
+def responder_correspondencia(request, correspondencia_id):
+    correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
+
+    if request.method == 'POST':
+        form = RespuestaCorrespondenciaForm(request.POST, instance=correspondencia)
+        if form.is_valid():
+            form.save()
+            return redirect('registro_correspondencia')  # Redirige a la lista de correspondencias
     else:
-        perfil_usuario = PerfilUsuario.objects.get(user=request.user)
-        correspondencias = Correspondencia.objects.filter(dependencia__empresa=perfil_usuario.empresa)  # Filtrar según la empresa del usuario
+        form = RespuestaCorrespondenciaForm(instance=correspondencia)
 
-    return render(request, 'gestion/lista_correspondencia.html', {'correspondencias': correspondencias})
-
+    return render(request, 'gestion/responder_correspondencia.html', {'form': form, 'correspondencia': correspondencia})
 
 @user_passes_test(es_admin)
 def crear_usuario(request):

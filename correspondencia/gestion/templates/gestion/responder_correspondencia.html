@@ -1,0 +1,27 @@
+<!-- responder_correspondencia.html -->
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responder Correspondencia</title>
+</head>
+<body>
+    <h1>Responder Correspondencia</h1>
+    <h2>Asunto: {{ correspondencia.asunto }}</h2>
+    <h3>Remitente: {{ correspondencia.remitente }}</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        <p>
+            <label for="id_respuesta">Respuesta:</label>
+            {{ form.respuesta }}
+        </p>
+        <button type="submit">Responder</button>
+    </form>
+
+    <a href="{% url 'lista_correspondencia' %}">Volver a la lista</a>
+</body>
+</html>

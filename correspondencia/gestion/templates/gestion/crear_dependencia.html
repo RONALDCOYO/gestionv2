@@ -10,7 +10,9 @@
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Guardar</button>
+        <button type="submit">Guardar</button> 
     </form>
+
+    <a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
 </body>
 </html>

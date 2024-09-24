@@ -14,8 +14,10 @@
     </select>
 
     <button type="submit">Crear Usuario</button>
+    
 </form>
 
+<a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
 {% if error %}
     <p style="color: red;">{{ error }}</p>
 {% endif %}

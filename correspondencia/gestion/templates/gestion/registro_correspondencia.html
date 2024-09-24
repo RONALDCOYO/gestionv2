@@ -1,18 +1,84 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Control de Correspondencia - {{ empresa.nombre }}</title>
+    <style>
+        /* Estilos para resaltar las correspondencias que necesitan respuesta */
+        .respuesta-necesaria {
+            background-color: #ffeb3b; /* Color amarillo para resaltar */
+            font-weight: bold;
+        }
+        .alerta {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <h1>Control de Correspondencia para {{ empresa.nombre }}</h1> <!-- Mostramos la empresa del usuario -->
+
+    <!-- Mostrar alerta si la correspondencia necesita respuesta -->
+    {% if correspondencia_necesita_respuesta %}
+        <div class="alerta">
+            ¡Alerta! Esta correspondencia requiere una respuesta.
+        </div>
+    {% endif %}
 
     <!-- Formulario para agregar correspondencia -->
     <h2>Registrar Correspondencia</h2>
     <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        {{ form.as_p }}
+        <!-- Campos del formulario -->
+        <p>
+            <label for="id_tipo_correspondencia">Tipo de Correspondencia:</label>
+            {{ form.tipo_correspondencia }}
+            {{ form.tipo_correspondencia.errors }}
+        </p>
+        <p>
+            <label for="id_dependencia">Dependencia:</label>
+            {{ form.dependencia }}
+            {{ form.dependencia.errors }}
+        </p>
+        <p>
+            <label for="id_entrada_salida">Entrada o Salida:</label>
+            {{ form.entrada_salida }}
+            {{ form.entrada_salida.errors }}
+        </p>
+        <p>
+            <label for="id_documento">Documento:</label>
+            {{ form.documento }}
+            {{ form.documento.errors}}
+        </p>
+        <p>
+            <label for="id_fecha">Fecha:</label>
+            {{ form.fecha }}
+            {{ form.fecha.errors }}
+        </p>
+      
+        <p>
+            <label for="id_asunto">Asunto:</label>
+            {{ form.asunto }}
+            {{ form.asunto.errors }}
+        </p>
+        <p>
+            <label for="id_remitente">Remitente:</label>
+            {{ form.remitente }}
+            {{ form.remitente.errors }}
+        </p>
+        <p>
+            <label for="id_destinatario">Destinatario:</label>
+            {{ form.destinatario }}
+            {{ form.destinatario.errors }}
+        </p>
+        <p>
+            <label for="id_necesita_respuesta">¿Requiere Respuesta?</label>
+            {{ form.necesita_respuesta }}
+            {{ form.necesita_respuesta.errors }}
+        </p>
 
         <!-- Mostrar errores no relacionados a campos individuales -->
         {% if form.non_field_errors %}
@@ -22,11 +88,11 @@
         {% endif %}
 
         <button type="submit">Registrar</button>
-       
     </form>
 
     <!-- Lista de correspondencia -->
-    <h2>Correspondencia Registrada</h2>
+    <h1>Lista de Correspondencias</h1>
+
     <table border="1">
         <thead>
             <tr>
@@ -36,39 +102,96 @@
                 <th>Entrada/Salida</th>
                 <th>Fecha</th>
                 <th>Documento</th>
+                <th>Asunto</th>
+                <th>Remitente</th>
+                <th>Destinatario</th>
+                <th>Necesita Respuesta</th>
+                <th>Estado de Respuesta</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
             {% for correspondencia in correspondencias %}
-                <tr>
+                <tr class="{% if correspondencia.necesita_respuesta and not correspondencia.respondida %}respuesta-necesaria{% endif %}">
                     <td>{{ correspondencia.consecutivo }}</td>
-                    <td>{{ correspondencia.tipo }}</td>
+                    <td>{{ correspondencia.tipo_correspondencia }}</td>
                     <td>{{ correspondencia.dependencia.nombre }}</td>
                     <td>{{ correspondencia.entrada_salida }}</td>
                     <td>{{ correspondencia.fecha }}</td>
                     <td>
-                        <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
+                        {% if correspondencia.documento %}
+                            <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
+                        {% else %}
+                            No hay documento adjunto
+                        {% endif %}
+                    </td>
+                    <td>{{ correspondencia.asunto }}</td>
+                    <td>{{ correspondencia.remitente }}</td>
+                    <td>{{ correspondencia.destinatario }}</td>
+                    <td>{{ correspondencia.necesita_respuesta|yesno:"Sí,No" }}</td>
+                    <td>
+                        {% if correspondencia.respondida %}
+                            Respondida el {{ correspondencia.fecha_respuesta }}
+                        {% else %}
+                            {% if correspondencia.id %}
+                                <a href="{% url 'responder_correspondencia' correspondencia.id %}">Responder</a>
+                            {% else %}
+                                Sin ID
+                            {% endif %}
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                   
-                    <td colspan="6">No hay correspondencia registrada para {{ empresa.nombre }}.</td>
+                    <td colspan="12">No hay correspondencia registrada.</td>
                 </tr>
             {% endfor %}
-
-          
         </tbody>
     </table>
+     
+   
 
-    <!-- Botón para agregar dependencias solo si es administrador -->
-    {% if user.is_superuser %}
-        <br>
-        <a href="{% url 'crear_dependencia' %}">Agregar Dependencia</a>
-        
-    {% endif %}
 
     <!-- Cerrar sesión -->
     <a href="{% url 'logout' %}"><button>Cerrar Sesión</button></a>
+    <a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const respuestaCheckbox = document.querySelector('#id_necesita_respuesta');
+            
+            if (respuestaCheckbox.checked) {
+                respuestaCheckbox.style.border = '2px solid red'; // Destacar en rojo si requiere respuesta
+                alert('Esta correspondencia necesita respuesta');
+            }
+        
+            respuestaCheckbox.addEventListener('change', function() {
+                if (respuestaCheckbox.checked) {
+                    respuestaCheckbox.style.border = '2px solid red';
+                } else {
+                    respuestaCheckbox.style.border = '';
+                }
+            });
+        });
+        </script>
+        
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.querySelector('#id_documento');
+        
+            if (!fileInput.value) {
+                fileInput.style.border = '2px solid red'; // Destacar en rojo si no hay documento
+            }
+        
+            fileInput.addEventListener('change', function() {
+                if (fileInput.value) {
+                    fileInput.style.border = ''; // Quitar el borde una vez se selecciona un archivo
+                }
+            });
+        });
+        </script>
+        
+
 </body>
 </html>

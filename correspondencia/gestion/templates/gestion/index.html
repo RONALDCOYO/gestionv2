@@ -46,7 +46,11 @@
                     <td>{{ correspondencia.entrada_salida }}</td>
                     <td>{{ correspondencia.fecha }}</td>
                     <td>
-                        <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
+                        {% if correspondencia.documento %}
+                            <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
+                        {% else %}
+                            No hay documento adjunto
+                        {% endif %}
                     </td>
                 </tr>
             {% empty %}

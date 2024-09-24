@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 
 
@@ -41,12 +42,38 @@ class Correspondencia(models.Model):
         ('Memorando', 'Memorando'),
         ('Email', 'Email'),
     ]
-    tipo = models.CharField(max_length=10, choices=TIPO_CORRESPONDENCIA)
+
+    ENTRADA_SALIDA = [
+        ('Entrada', 'Entrada'),
+        ('Salida', 'Salida'),
+    ]
+
+    entrada_salida = models.CharField(max_length=10, choices=ENTRADA_SALIDA)
+    tipo_correspondencia = models.CharField(max_length=20, choices=TIPO_CORRESPONDENCIA)
+    consecutivo = models.CharField(max_length=100)
     dependencia = models.ForeignKey(Dependencia, on_delete=models.CASCADE)
     entrada_salida = models.CharField(max_length=10)
-    documento = models.FileField(upload_to='documentos/')
     fecha = models.DateField(null=False)
-    consecutivo = models.CharField(max_length=50)
-    user= models.ForeignKey(User, on_delete=models.CASCADE, null=False, blank=False)
+    documento = models.FileField(upload_to='correspondencias/', null=True, blank=True)
+    asunto = models.CharField(max_length=255)
+    remitente = models.CharField(max_length=255)
+    destinatario = models.CharField(max_length=255)
+    necesita_respuesta = models.BooleanField(default=False)
+    respondida = models.BooleanField(default=False)  # Nuevo campo
+    respuesta = models.TextField(blank=True, null=True)  # Campo para almacenar la respuesta
+    fecha_respuesta = models.DateTimeField(null=True, blank=True)  # Fecha de respuesta
+    
+    def marcar_como_respondida(self, respuesta_texto):
+        """Marca la correspondencia como respondida y almacena la respuesta"""
+        self.respondida = True
+        self.respuesta = respuesta_texto
+        self.fecha_respuesta = timezone.now()
+        self.save()
     def __str__(self):
         return self.consecutivo
+
+
+class RespuestaCorrespondencia(models.Model):
+    correspondencia = models.ForeignKey(Correspondencia, on_delete=models.CASCADE)
+    respuesta = models.TextField()
+    fecha_respuesta = models.DateField()

@@ -12,9 +12,12 @@ class EmpresaForm(forms.ModelForm):
 
 
 class CorrespondenciaForm(forms.ModelForm):
+    
+    fecha = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
+    
     class Meta:
         model = Correspondencia
-        fields = ['tipo', 'dependencia', 'entrada_salida', 'documento', 'fecha']
+        fields = ['tipo_correspondencia', 'dependencia', 'entrada_salida', 'fecha', 'documento', 'asunto', 'remitente', 'destinatario', 'necesita_respuesta']
 
     def __init__(self, *args, **kwargs):
         # Pasar el usuario desde la vista al formulario
@@ -36,6 +39,18 @@ class CorrespondenciaForm(forms.ModelForm):
                     # De lo contrario, no permitir la selección de dependencias
                     self.fields['dependencia'].queryset = Dependencia.objects.none()
 
+class RespuestaCorrespondenciaForm(forms.ModelForm):
+    class Meta:
+        model = Correspondencia
+        fields = ['respuesta']
+
+    def save(self, commit=True):
+        correspondencia = super().save(commit=False)
+        correspondencia.marcar_como_respondida(self.cleaned_data['respuesta'])
+        if commit:
+            correspondencia.save()
+        return correspondencia
+    
 
 class DependenciaForm(forms.ModelForm):
     class Meta:
@@ -58,3 +73,5 @@ class RegistroUsuarioForm(forms.ModelForm):
             user.save()
             PerfilUsuario.objects.create(user=user, empresa=self.cleaned_data['empresa'])  # Crea el perfil de usuario y asocia la empresa
         return user
+    
+

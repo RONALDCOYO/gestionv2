@@ -5,7 +5,6 @@ from . import views
 
 urlpatterns = [
     path('', lambda request: redirect('login')),
-    #path('', views.portada, name='login'),
     path('portada/', views.portada, name='portada'),
     path('registrar_usuario/', views.crear_usuario, name='registrar_usuario'),
     path('crear_dependencia/', views.crear_dependencia, name='crear_dependencia'),
@@ -14,5 +13,6 @@ urlpatterns = [
     path('index/', views.index, name='index'),
     path('login/', auth_views.LoginView.as_view(), name='login'),  # Vista de login de Django
     path('logout/', views.logout_view, name='logout'),
-    path('lista_correspondencia/', views.lista_correspondencia, name='lista_correspondencia')
+    path('lista_correspondencia/', views.lista_correspondencia, name='lista_correspondencia'),
+    path('responder_correspondencia/<int:correspondencia_id>/', views.responder_correspondencia, name='responder_correspondencia'),
 ]

@@ -1,0 +1,83 @@
+<!-- lista_correspondencia.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Correspondencias</title>
+    <style>
+        .respuesta-necesaria {
+            background-color: #ffdddd; /* Fondo rojo claro para correspondencias que necesitan respuesta */
+        }
+        .sin-documento {
+            color: red; /* Resaltar en rojo si no hay documento */
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Correspondencias</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Consecutivo</th>
+                <th>Tipo</th>
+                <th>Dependencia</th>
+                <th>Entrada/Salida</th>
+                <th>Fecha</th>
+                <th>Documento</th>
+                <th>Asunto</th>
+                <th>Remitente</th>
+                <th>Destinatario</th>
+                <th>Necesita Respuesta</th>
+                <th>Estado de Respuesta</th>
+                <th>Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in correspondencias %}
+                <tr class="{% if item.correspondencia.necesita_respuesta and not item.correspondencia.respondida %}respuesta-necesaria{% endif %}">
+                    <td>{{ item.correspondencia.consecutivo }}</td>
+                    <td>{{ item.correspondencia.tipo_correspondencia }}</td>
+                    <td>{{ item.correspondencia.dependencia.nombre }}</td>
+                    <td>{{ item.correspondencia.entrada_salida }}</td>
+                    <td>{{ item.correspondencia.fecha }}</td>
+                    <td>
+                        {% if item.correspondencia.documento %}
+                            <a href="{{ item.correspondencia.documento.url }}">Ver Documento</a>
+                        {% else %}
+                            No hay documento adjunto
+                        {% endif %}
+                    </td>
+                    <td>{{ item.correspondencia.asunto }}</td>
+                    <td>{{ item.correspondencia.remitente }}</td>
+                    <td>{{ item.correspondencia.destinatario }}</td>
+                    <td>{{ item.correspondencia.necesita_respuesta|yesno:"Sí,No" }}</td>
+                    <td>
+                        {% if item.correspondencia.respondida %}
+                            Respondida el {{ item.correspondencia.fecha_respuesta }}
+                        {% else %}
+                            Pendiente
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not item.correspondencia.respondida and item.correspondencia.necesita_respuesta %}
+                            <a href="{% url 'responder_correspondencia' item.correspondencia.id %}">Responder</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="12">No hay correspondencia registrada.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <!-- Cerrar sesión -->
+    <a href="{% url 'logout' %}"><button>Cerrar Sesión</button></a>
+    <a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
+
+
+</body>
+</html>
