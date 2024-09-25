@@ -22,6 +22,13 @@
 </head>
 <body>
     <div class="container mt-5">
+        
+        {% if empresa.logo %}
+            <div class="text-center mb-4">
+                <img src="{{ empresa.logo.url }}" alt="{{ empresa.nombre }} Logo" class="img-fluid" style="max-height: 150px;">
+            </div>
+        {% endif %}
+
         <h1 class="text-center">Control de Correspondencia para {{ empresa.nombre }}</h1>
 
         <!-- Mostrar alerta si la correspondencia necesita respuesta -->
@@ -30,6 +37,7 @@
                 ¡Alerta! Esta correspondencia requiere una respuesta.
             </div>
         {% endif %}
+
 
         <!-- Formulario para agregar correspondencia -->
         <div class="card mb-4">

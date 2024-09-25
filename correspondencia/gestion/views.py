@@ -12,9 +12,13 @@ from django.contrib import messages
 # Vista de la página principal (portada)
 @login_required
 def portada(request):
-    return render(request, 'portada.html')
+    try:
+        perfil = PerfilUsuario.objects.get(user=request.user)
+        empresa = perfil.empresa
+    except PerfilUsuario.DoesNotExist:
+        empresa = None
 
-
+    return render(request, 'portada.html', {'empresa': empresa})
 
 
 # Función para comprobar si el usuario es administrador

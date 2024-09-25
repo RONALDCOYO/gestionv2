@@ -7,6 +7,7 @@ from django.utils import timezone
 class Empresa(models.Model):
     nombre = models.CharField(max_length=100)
     codigo = models.CharField(max_length=10)
+    logo = models.ImageField(upload_to='logos_empresas/', null=True, blank=True)  # Campo para la imagen del logo
 
     def __str__(self):
         return self.nombre
