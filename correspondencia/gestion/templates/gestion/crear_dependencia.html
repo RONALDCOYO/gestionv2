@@ -1,18 +1,18 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Dependencia</title>
-</head>
-<body>
-    <h1>Crear Nueva Dependencia</h1>
-    <form method="POST">
+{% extends 'base.html' %}
+
+{% block title %}Crear Dependencia{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Crear Nueva Dependencia</h2>
+
+    <form method="POST" class="form">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Guardar</button> 
+
+        <button type="submit" class="btn btn-primary mt-3">Guardar</button>
     </form>
 
-    <a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
-</body>
-</html>
+    <a href="{% url 'portada' %}" class="btn btn-secondary mt-3">Volver a la Portada</a>
+</div>
+{% endblock %}

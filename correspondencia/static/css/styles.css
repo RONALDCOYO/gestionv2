@@ -1,0 +1,17 @@
+/* Estilos personalizados para mejorar la apariencia de la aplicación */
+.navbar {
+    background-color: #343a40 !important;
+}
+
+.navbar .navbar-brand, .navbar .nav-link {
+    color: #fff !important;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.respuesta-necesaria {
+    background-color: #ffeb3b;
+    font-weight: bold;
+}

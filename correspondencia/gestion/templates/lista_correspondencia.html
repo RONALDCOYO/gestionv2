@@ -1,24 +1,13 @@
-<!-- lista_correspondencia.html -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lista de Correspondencias</title>
-    <style>
-        .respuesta-necesaria {
-            background-color: #ffdddd; /* Fondo rojo claro para correspondencias que necesitan respuesta */
-        }
-        .sin-documento {
-            color: red; /* Resaltar en rojo si no hay documento */
-        }
-    </style>
-</head>
-<body>
-    <h1>Lista de Correspondencias</h1>
+{% extends 'base.html' %}
 
-    <table border="1">
-        <thead>
+{% block title %}Lista de Correspondencias{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Lista de Correspondencias</h1>
+
+    <table class="table table-striped table-bordered">
+        <thead class="thead-dark">
             <tr>
                 <th>Consecutivo</th>
                 <th>Tipo</th>
@@ -31,12 +20,12 @@
                 <th>Destinatario</th>
                 <th>Necesita Respuesta</th>
                 <th>Estado de Respuesta</th>
-                
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody>
             {% for item in correspondencias %}
-                <tr class="{% if item.correspondencia.necesita_respuesta and not item.correspondencia.respondida %}respuesta-necesaria{% endif %}">
+                <tr class="{% if item.correspondencia.necesita_respuesta and not item.correspondencia.respondida %}table-warning{% endif %}">
                     <td>{{ item.correspondencia.consecutivo }}</td>
                     <td>{{ item.correspondencia.tipo_correspondencia }}</td>
                     <td>{{ item.correspondencia.dependencia.nombre }}</td>
@@ -44,9 +33,9 @@
                     <td>{{ item.correspondencia.fecha }}</td>
                     <td>
                         {% if item.correspondencia.documento %}
-                            <a href="{{ item.correspondencia.documento.url }}">Ver Documento</a>
+                            <a href="{{ item.correspondencia.documento.url }}" class="btn btn-link">Ver Documento</a>
                         {% else %}
-                            No hay documento adjunto
+                            <span class="text-danger">No hay documento adjunto</span>
                         {% endif %}
                     </td>
                     <td>{{ item.correspondencia.asunto }}</td>
@@ -57,27 +46,27 @@
                         {% if item.correspondencia.respondida %}
                             Respondida el {{ item.correspondencia.fecha_respuesta }}
                         {% else %}
-                            Pendiente
+                            <span class="text-danger">Pendiente</span>
                         {% endif %}
                     </td>
                     <td>
                         {% if not item.correspondencia.respondida and item.correspondencia.necesita_respuesta %}
-                            <a href="{% url 'responder_correspondencia' item.correspondencia.id %}">Responder</a>
+                            <a href="{% url 'responder_correspondencia' item.correspondencia.id %}" class="btn btn-primary btn-sm">Responder</a>
                         {% endif %}
                     </td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="12">No hay correspondencia registrada.</td>
+                    <td colspan="12" class="text-center">No hay correspondencia registrada.</td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
-    
-    <!-- Cerrar sesión -->
-    <a href="{% url 'logout' %}"><button>Cerrar Sesión</button></a>
-    <a href="{% url 'portada' %}"><button>Volver a la Portada</button></a>
 
-
-</body>
-</html>
+    <!-- Botones de acciones generales -->
+    <div class="mt-4">
+        <a href="{% url 'logout' %}" class="btn btn-danger">Cerrar Sesión</a>
+        <a href="{% url 'portada' %}" class="btn btn-secondary">Volver a la Portada</a>
+    </div>
+</div>
+{% endblock %}

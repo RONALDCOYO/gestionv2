@@ -1,27 +1,24 @@
-<!-- responder_correspondencia.html -->
-{% load static %}
+{% extends 'base.html' %}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responder Correspondencia</title>
-</head>
-<body>
-    <h1>Responder Correspondencia</h1>
-    <h2>Asunto: {{ correspondencia.asunto }}</h2>
-    <h3>Remitente: {{ correspondencia.remitente }}</h3>
+{% block title %}Responder Correspondencia{% endblock %}
 
-    <form method="POST">
+{% block content %}
+<div class="container mt-5">
+    <h1>Responder Correspondencia {{ correspondencia.consecutivo }}</h1>
+    <h2 class="mt-4">Asunto: {{ correspondencia.asunto }}</h2>
+    <h3 class="mb-4">Remitente: {{ correspondencia.remitente }}</h3>
+
+    <form method="POST" class="form">
         {% csrf_token %}
-        <p>
+        
+        <div class="form-group">
             <label for="id_respuesta">Respuesta:</label>
             {{ form.respuesta }}
-        </p>
-        <button type="submit">Responder</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Responder</button>
     </form>
 
-    <a href="{% url 'registro_correspondencia' %}"><button>Volver</button></a>
-</body>
-</html>
+    <a href="{% url 'registro_correspondencia' %}" class="btn btn-secondary mt-3">Volver</a>
+</div>
+{% endblock %}

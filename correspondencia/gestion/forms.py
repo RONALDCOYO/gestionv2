@@ -39,6 +39,13 @@ class CorrespondenciaForm(forms.ModelForm):
                     # De lo contrario, no permitir la selección de dependencias
                     self.fields['dependencia'].queryset = Dependencia.objects.none()
 
+          # Agregar clases de Bootstrap a todos los widgets
+        for field_name, field in self.fields.items():
+            field.widget.attrs['class'] = 'form-control'           
+
+
+
+
 class DocumentoForm(forms.ModelForm):
     class Meta:
         model = Correspondencia

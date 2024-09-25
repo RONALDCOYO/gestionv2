@@ -1,24 +1,22 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Adjuntar Documento</title>
-</head>
-<body>
-    <h1>Adjuntar Documento a la Correspondencia {{ correspondencia.consecutivo }}</h1>
-    
-    <form method="post" enctype="multipart/form-data">
+{% extends 'base.html' %}
+
+{% block title %}Adjuntar Documento{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2>Adjuntar Documento a la Correspondencia {{ correspondencia.consecutivo }}</h2>
+
+    <form method="post" enctype="multipart/form-data" class="form">
         {% csrf_token %}
-        <p>
+        
+        <div class="form-group">
             <label for="id_documento">Documento:</label>
             {{ form.documento }}
-            {{ form.documento.errors }}
-        </p>
-        <button type="submit">Adjuntar</button>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Adjuntar</button>
     </form>
-    
-    <a href="{% url 'registro_correspondencia' %}"><button>Volver</button></a>
-    
-</body>
-</html>
+
+    <a href="{% url 'registro_correspondencia' %}" class="btn btn-secondary mt-3">Volver</a>
+</div>
+{% endblock %}

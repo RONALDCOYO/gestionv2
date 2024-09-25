@@ -1,25 +1,25 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Página Principal</title>
-</head>
-<body>
-    <h1>Bienvenido, {{ user.username }}</h1>
-    
+{% extends 'base.html' %}
+
+{% block title %}Página Principal{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1 class="mb-4">Bienvenido, {{ user.username }}</h1>
+
     <!-- Mostrar los botones solo si el usuario es administrador -->
     {% if user.is_superuser %}
-        <a href="{% url 'registrar_usuario' %}"><button>Registrar Usuario</button></a>
-        <a href="{% url 'crear_dependencia' %}"><button>Registrar Dependencia</button></a>
-        <a href="{% url 'crear_empresa' %}"><button>Crear Empresa</button></a>
-        <a href="{% url 'lista_correspondencia' %}"><button>Correspondencia</button></a>
+        <div class="btn-group mb-3" role="group" aria-label="Opciones de administración">
+            <a href="{% url 'registrar_usuario' %}" class="btn btn-primary">Registrar Usuario</a>
+            <a href="{% url 'crear_dependencia' %}" class="btn btn-primary">Registrar Dependencia</a>
+            <a href="{% url 'crear_empresa' %}" class="btn btn-primary">Crear Empresa</a>
+            <a href="{% url 'lista_correspondencia' %}" class="btn btn-primary">Correspondencia</a>
+        </div>
     {% endif %}
 
     <!-- Todos los usuarios pueden ver el botón de registrar correspondencia -->
-    <a href="{% url 'registro_correspondencia' %}"><button>Registrar Correspondencia</button></a>
+    <a href="{% url 'registro_correspondencia' %}" class="btn btn-success mb-3">Registrar Correspondencia</a>
 
     <!-- Cerrar sesión -->
-    <a href="{% url 'logout' %}"><button>Cerrar Sesión</button></a>
-</body>
-</html>
+    <a href="{% url 'logout' %}" class="btn btn-danger">Cerrar Sesión</a>
+</div>
+{% endblock %}
