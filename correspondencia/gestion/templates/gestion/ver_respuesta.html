@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ver Respuesta</title>
+</head>
+<body>
+    <h1>Respuesta para la Correspondencia {{ correspondencia.consecutivo }}</h1>
+    <p><strong>Asunto:</strong> {{ correspondencia.asunto }}</p>
+    <p><strong>Respuesta:</strong> {{ correspondencia.respuesta }}</p>
+    <p><strong>Fecha de Respuesta:</strong> {{ correspondencia.fecha_respuesta }}</p>
+
+    <a href="{% url 'registro_correspondencia' %}">Volver</a>
+</body>
+</html>

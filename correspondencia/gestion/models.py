@@ -41,18 +41,19 @@ class Correspondencia(models.Model):
         ('Carta', 'Carta'),
         ('Memorando', 'Memorando'),
         ('Email', 'Email'),
+        ('DP', 'DP'),
     ]
 
     ENTRADA_SALIDA = [
         ('Entrada', 'Entrada'),
         ('Salida', 'Salida'),
+        
     ]
 
     entrada_salida = models.CharField(max_length=10, choices=ENTRADA_SALIDA)
     tipo_correspondencia = models.CharField(max_length=20, choices=TIPO_CORRESPONDENCIA)
     consecutivo = models.CharField(max_length=100)
     dependencia = models.ForeignKey(Dependencia, on_delete=models.CASCADE)
-    entrada_salida = models.CharField(max_length=10)
     fecha = models.DateField(null=False)
     documento = models.FileField(upload_to='correspondencias/', null=True, blank=True)
     asunto = models.CharField(max_length=255)

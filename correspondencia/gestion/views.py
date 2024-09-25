@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.storage import default_storage
 from .models import Correspondencia, PerfilUsuario, Empresa
-from .forms import RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm
+from .forms import DocumentoForm, RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 
@@ -137,6 +137,18 @@ def responder_correspondencia(request, correspondencia_id):
 
     return render(request, 'gestion/responder_correspondencia.html', {'form': form, 'correspondencia': correspondencia})
 
+
+@login_required
+def ver_respuesta(request, correspondencia_id):
+    correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
+
+    # Solo permitir ver la respuesta si la correspondencia ha sido respondida
+    if not correspondencia.respondida:
+        messages.error(request, "Esta correspondencia aún no ha sido respondida.")
+        return redirect('registro_correspondencia')
+
+    return render(request, 'gestion/ver_respuesta.html', {'correspondencia': correspondencia})
+
 @user_passes_test(es_admin)
 def crear_usuario(request):
     if request.method == 'POST':
@@ -235,6 +247,27 @@ def registrar_usuario(request):
         form = RegistroUsuarioForm()
 
     return render(request, 'registro_usuario.html', {'form': form})
+
+
+
+@login_required
+def adjuntar_documento(request, correspondencia_id):
+    # Obtener la instancia de la correspondencia
+    correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
+
+    if request.method == 'POST':
+        form = DocumentoForm(request.POST, request.FILES, instance=correspondencia)
+
+        if form.is_valid():
+            # Guardar solo el documento subido
+            form.save()
+            messages.success(request, 'Documento adjuntado con éxito.')
+            return redirect('registro_correspondencia')
+    else:
+        form = DocumentoForm(instance=correspondencia)
+
+    return render(request, 'gestion/adjuntar_documento.html', {'form': form, 'correspondencia': correspondencia})
+
 
 
 # Vista para cerrar sesión

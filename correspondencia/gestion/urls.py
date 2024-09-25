@@ -1,5 +1,7 @@
 from django.contrib.auth import views as auth_views
 from django.urls import path
+from django.conf.urls.static import static
+from django.conf import settings
 from django.shortcuts import redirect
 from . import views
 
@@ -15,4 +17,7 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('lista_correspondencia/', views.lista_correspondencia, name='lista_correspondencia'),
     path('responder_correspondencia/<int:correspondencia_id>/', views.responder_correspondencia, name='responder_correspondencia'),
-]
+    path('adjuntar_documento/<int:correspondencia_id>/', views.adjuntar_documento, name='adjuntar_documento'),
+    path('ver_respuesta/<int:correspondencia_id>/', views.ver_respuesta, name='ver_respuesta'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+ 

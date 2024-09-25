@@ -107,7 +107,7 @@
                 <th>Destinatario</th>
                 <th>Necesita Respuesta</th>
                 <th>Estado de Respuesta</th>
-                <th>Acción</th>
+                <th>Respuesta</th>
             </tr>
         </thead>
         <tbody>
@@ -122,7 +122,7 @@
                         {% if correspondencia.documento %}
                             <a href="{{ correspondencia.documento.url }}">Ver Documento</a>
                         {% else %}
-                            No hay documento adjunto
+                        <a href="{% url 'adjuntar_documento' correspondencia.id %}">Adjuntar Documento</a>
                         {% endif %}
                     </td>
                     <td>{{ correspondencia.asunto }}</td>
@@ -138,6 +138,13 @@
                             {% else %}
                                 Sin ID
                             {% endif %}
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if correspondencia.respondida %}
+                            <a href="{% url 'ver_respuesta' correspondencia.id %}">Ver Respuesta</a>
+                        {% else %}
+                            Sin Respuesta
                         {% endif %}
                     </td>
                 </tr>

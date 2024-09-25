@@ -92,8 +92,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 
 
-#LOGIN_URL = '/login/'  # Asegúrate de que el login esté apuntando a la URL correcta en tu urls.py
-#LOGOUT_REDIRECT_URL = '/login/'  # Para redirigir después de cerrar sesión
 
 
 LOGIN_REDIRECT_URL = 'portada'  # Cambia esto por el URL de tu módulo de registro de correspondencia

@@ -39,6 +39,13 @@ class CorrespondenciaForm(forms.ModelForm):
                     # De lo contrario, no permitir la selección de dependencias
                     self.fields['dependencia'].queryset = Dependencia.objects.none()
 
+class DocumentoForm(forms.ModelForm):
+    class Meta:
+        model = Correspondencia
+        fields = ['documento']  # Solo incluimos el campo 'documento'
+
+
+
 class RespuestaCorrespondenciaForm(forms.ModelForm):
     class Meta:
         model = Correspondencia
@@ -73,5 +80,8 @@ class RegistroUsuarioForm(forms.ModelForm):
             user.save()
             PerfilUsuario.objects.create(user=user, empresa=self.cleaned_data['empresa'])  # Crea el perfil de usuario y asocia la empresa
         return user
+    
+
+
     
 
