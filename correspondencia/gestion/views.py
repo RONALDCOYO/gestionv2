@@ -55,7 +55,7 @@ def registro_correspondencia(request):
             empresa = None
         else:
             # Redirigir a una página de error o mostrar un mensaje si el perfil no existe.
-            return redirect('error')  # Asegúrate de que 'error' esté definido en tus URL
+            return redirect('error')  # 'error' esté definido en tus URL
 
     # Si la solicitud es POST, se procesa el formulario
     if request.method == 'POST':
