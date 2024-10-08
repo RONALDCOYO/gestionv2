@@ -25,5 +25,6 @@ urlpatterns = [
     path('editar_dependencia/<int:dependencia_id>/', views.editar_dependencia, name='editar_dependencia'),
     path('editar_usuario/<int:usuario_id>/', views.editar_usuario, name='editar_usuario'),
     path('error/', views.error_view, name='error'),
+    path('dashboard/', views.dashboard, name='dashboard'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
  

@@ -8,6 +8,7 @@ from .models import Correspondencia, PerfilUsuario, Empresa, Dependencia
 from .forms import DocumentoForm, EditarUsuarioForm, RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm, FiltroCorrespondenciaForm
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.db.models import Count, Q
 
 
 # Vista de la página principal (portada)
@@ -456,6 +457,34 @@ def exportar_excel(request):
         'dependencias': dependencias,
         'correspondencias': correspondencias,
     })
+
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def dashboard(request):
+    # Filtrar y contar correspondencias
+    correspondencias = Correspondencia.objects.all()
+    total_correspondencias = correspondencias.count()
+    
+    # Agrupar por empresa
+    correspondencias_por_empresa = correspondencias.values('dependencia__empresa__nombre').annotate(total=Count('id')).order_by('dependencia__empresa__nombre')
+    
+    # Preparar listas para etiquetas y datos
+    empresas = [item['dependencia__empresa__nombre'] for item in correspondencias_por_empresa]
+    totales = [item['total'] for item in correspondencias_por_empresa]
+
+    # Datos de respondidas y pendientes
+    respondidas = correspondencias.filter(respondida=True).count()
+    pendientes = correspondencias.filter(respondida=False).count()
+
+    return render(request, 'gestion/dashboard.html', {
+        'total_correspondencias': total_correspondencias,
+        'empresas': empresas,
+        'totales': totales,
+        'respondidas': respondidas,
+        'pendientes': pendientes,
+    })
+
 
 def error_view(request):
     return render(request, 'gestion/error.html', {"message": "Ha ocurrido un error"})

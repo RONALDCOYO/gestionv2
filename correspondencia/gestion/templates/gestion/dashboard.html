@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Dashboard del Administrador</h1>
+
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <h4>Correspondencias Registradas</h4>
+            <p>Total: {{ total_correspondencias }}</p>
+        </div>
+
+        <div class="col-md-4">
+            <h4>Correspondencias por Estado</h4>
+            <ul>
+                <li>Respondidas: {{ respondidas }}</li>
+                <li>Pendientes: {{ pendientes }}</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <canvas id="chartEmpresa"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts de Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Datos para el gráfico de empresa
+    var ctxEmpresa = document.getElementById('chartEmpresa').getContext('2d');
+    var chartEmpresa = new Chart(ctxEmpresa, {
+        type: 'bar',
+        data: {
+            labels: {{ empresas|safe }},  // Aquí usamos la variable "empresas" que es una lista de nombres
+            datasets: [{
+                label: 'Correspondencias por Empresa',
+                data: {{ totales|safe }},  // Aquí usamos la variable "totales" que es una lista de totales
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+    });
+</script>
+
+<div class="mt-4">
+    <a href="{% url 'logout' %}" class="btn btn-danger">Cerrar Sesión</a>
+    <a href="{% url 'portada' %}" class="btn btn-secondary">Volver a la Portada</a>
+</div>
+{% endblock %}
