@@ -14,20 +14,6 @@ class Empresa(models.Model):
     
 from django.db import models
 
-class gestion_empresa(models.Model):
-    nombre = models.CharField(max_length=100)  # Campo para el nombre de la empresa
-
-    def __str__(self):
-        return self.nombre  # Esto permitirá que el nombre de la empresa se muestre en el formulario
-
-    
-class PerfilUsuario(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Asegúrate de que el campo se llame 'user'
-    empresa = models.ForeignKey(Empresa, on_delete=models.CASCADE)
-    def __str__(self):
-        return f"{self.user.username} - {self.empresa.nombre}"
-
-
 
 class Dependencia(models.Model):
     nombre = models.CharField(max_length=100)
@@ -36,6 +22,26 @@ class Dependencia(models.Model):
 
     def __str__(self):
         return self.nombre
+
+class gestion_empresa(models.Model):
+    nombre = models.CharField(max_length=100)  # Campo para el nombre de la empresa
+
+    def __str__(self):
+        return self.nombre  # Esto permitirá que el nombre de la empresa se muestre en el formulario
+
+    
+class PerfilUsuario(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    empresas = models.ManyToManyField(Empresa, blank=True)  # Ahora un usuario puede estar en varias empresas
+    dependencias = models.ManyToManyField(Dependencia, blank=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {', '.join([empresa.nombre for empresa in self.empresas.all()])}"
+
+
+
+
+    
 
 class Correspondencia(models.Model):
     TIPO_CORRESPONDENCIA = [
@@ -64,6 +70,8 @@ class Correspondencia(models.Model):
     respondida = models.BooleanField(default=False)  # Nuevo campo
     respuesta = models.TextField(blank=True, null=True)  # Campo para almacenar la respuesta
     fecha_respuesta = models.DateTimeField(null=True, blank=True)  # Fecha de respuesta
+    documento_respuesta = models.FileField(upload_to='respuestas/', null=True, blank=True)  # Campo para el documento de respuesta
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     
     def marcar_como_respondida(self, respuesta_texto):
         """Marca la correspondencia como respondida y almacena la respuesta"""
@@ -79,3 +87,4 @@ class RespuestaCorrespondencia(models.Model):
     correspondencia = models.ForeignKey(Correspondencia, on_delete=models.CASCADE)
     respuesta = models.TextField()
     fecha_respuesta = models.DateField()
+    documento_respuesta = models.FileField(upload_to='respuestas/', null=True, blank=True)  # Nuevo campo para el documento

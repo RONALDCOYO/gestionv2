@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Editar Dependencia{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Editar Dependencia</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+    </form>
+    <a href="{% url 'lista_correspondencia' %}" class="btn btn-secondary mt-3">Cancelar</a>
+</div>
+{% endblock %}

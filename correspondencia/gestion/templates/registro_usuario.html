@@ -7,33 +7,98 @@
     <h2>Crear Usuario</h2>
     <form method="post" class="form">
         {% csrf_token %}
-        
+
         <div class="form-group">
             <label for="username">Nombre de Usuario:</label>
-            <input type="text" name="username" class="form-control" required>
+            {{ form.username }}
         </div>
 
         <div class="form-group">
             <label for="password">Contraseña:</label>
-            <input type="password" name="password" class="form-control" required>
+            {{ form.password }}
         </div>
 
+        <!-- Campo de Empresas -->
         <div class="form-group">
-            <label for="empresa">Empresa:</label>
-            <select name="empresa" class="form-control">
-                {% for empresa in empresas %}
+            <label for="id_empresas">Empresas:</label>
+            <select id="id_empresas" name="empresas[]" class="form-control" multiple>
+                {% for empresa in form.empresas.field.queryset %}
                     <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
                 {% endfor %}
             </select>
         </div>
 
-        <button type="submit" class="btn btn-primary">Crear Usuario</button>
+        <!-- Dependencias Dinámicas -->
+        <div id="dependencias-container">
+            <!-- Aquí se cargarán las dependencias por cada empresa seleccionada -->
+        </div>
+
+        <button type="submit" class="btn btn-primary">Guardar</button>
     </form>
 
     <a href="{% url 'portada' %}" class="btn btn-secondary mt-3">Volver a la Portada</a>
+    
+
 
     {% if error %}
         <div class="alert alert-danger mt-3">{{ error }}</div>
     {% endif %}
 </div>
+
+    <!-- Script para manejar la carga dinámica de dependencias -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+
+$(document).ready(function() {
+    $('#id_empresas').change(function() {
+        var empresasIds = $(this).val();
+
+        console.log('Empresas seleccionadas:', empresasIds);
+
+        var url = "{% url 'filtrar_dependencias_por_empresa' %}";
+
+        if (empresasIds.length > 0) {
+            $.ajax({
+                url: url,
+                data: {
+                    'empresas_ids[]': empresasIds
+                },
+                success: function(data) {
+                    console.log('Dependencias recibidas:', data);
+
+                    var dependenciasContainer = $('#dependencias-container');
+                    dependenciasContainer.empty();
+
+                    if (data.length > 0) {
+                        dependenciasContainer.append('<h5>Dependencias disponibles:</h5>');
+                        var checkboxGroup = $('<div class="form-group"></div>');
+
+                        $.each(data, function(index, dependencia) {
+                            var checkbox = '<div class="form-check">' +
+                                '<input class="form-check-input" type="checkbox" name="dependencias" value="' + dependencia.id + '">' +
+                                '<label class="form-check-label">' + dependencia.nombre + ' (Empresa: ' + dependencia.empresa__nombre + ')</label>' +
+                                '</div>';
+                            checkboxGroup.append(checkbox);
+                        });
+
+                        dependenciasContainer.append(checkboxGroup);
+                    } else {
+                        dependenciasContainer.append('<p>No hay dependencias disponibles.</p>');
+                    }
+                },
+                error: function(error) {
+                    console.error("Error al cargar dependencias:", error);
+                }
+            });
+        } else {
+            console.log('No se seleccionaron empresas');
+        }
+    });
+});
+
+
+       
+    </script>   
+
 {% endblock %}

@@ -1,10 +1,11 @@
-from django.http import HttpResponse
+import openpyxl
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth import login, authenticate, logout
 from django.core.files.storage import default_storage
-from .models import Correspondencia, PerfilUsuario, Empresa
-from .forms import DocumentoForm, RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm
+from .models import Correspondencia, PerfilUsuario, Empresa, Dependencia
+from .forms import DocumentoForm, EditarUsuarioForm, RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm, FiltroCorrespondenciaForm
 from django.contrib.auth.models import User
 from django.contrib import messages
 
@@ -12,13 +13,36 @@ from django.contrib import messages
 # Vista de la página principal (portada)
 @login_required
 def portada(request):
+    # Obtener la empresa seleccionada de la URL
+    empresa_id = request.GET.get('empresa_id')
+
+    if empresa_id:
+        # Redirigir al registro de correspondencia con el ID de la empresa
+        return redirect('registro_correspondencia', empresa_id=empresa_id)
+
+    # Si no hay empresa seleccionada, mostrar la portada
     try:
         perfil = PerfilUsuario.objects.get(user=request.user)
-        empresa = perfil.empresa
+        empresas = perfil.empresas.all()
+        dependencias = perfil.dependencias.all()
     except PerfilUsuario.DoesNotExist:
-        empresa = None
+        empresas = []
+        dependencias = []
 
-    return render(request, 'portada.html', {'empresa': empresa})
+    # Si el usuario es superusuario, obtener todos los usuarios, empresas y dependencias
+    if request.user.is_superuser:
+        usuarios = User.objects.all()  # Obtener todos los usuarios
+        empresas = Empresa.objects.all()  # Obtener todas las empresas
+        dependencias = Dependencia.objects.all()  # Obtener todas las dependencias
+    else:
+        usuarios = None
+
+    # Renderizar la plantilla de la portada con los datos
+    return render(request, 'portada.html', {
+        'empresas': empresas,
+        'dependencias': dependencias,
+        'usuarios': usuarios  # Pasar los usuarios si es superusuario
+    })
 
 
 # Función para comprobar si el usuario es administrador
@@ -28,7 +52,7 @@ def es_admin(user):
 
 # Vista para registrar empresa (solo admin)
 @login_required
-@user_passes_test(es_admin)
+@user_passes_test(lambda u: u.is_superuser)
 def registrar_empresa(request):
     if request.method == 'POST':
         form = EmpresaForm(request.POST)
@@ -45,26 +69,39 @@ from django.core.exceptions import ObjectDoesNotExist
 
 
 
-@login_required
-def registro_correspondencia(request):
-    try:
-        perfil = PerfilUsuario.objects.get(user=request.user)
-        empresa = perfil.empresa
-    except PerfilUsuario.DoesNotExist:
-        if request.user.is_superuser:
-            empresa = None
-        else:
-            # Redirigir a una página de error o mostrar un mensaje si el perfil no existe.
-            return redirect('error')  # 'error' esté definido en tus URL
+from .models import Empresa, Dependencia  # Asegúrate de importar estos modelos
 
-    # Si la solicitud es POST, se procesa el formulario
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def editar_empresa(request, empresa_id):
+    empresa = get_object_or_404(Empresa, id=empresa_id)
     if request.method == 'POST':
-        form = CorrespondenciaForm(request.POST, request.FILES, user=request.user)
+        form = EmpresaForm(request.POST, instance=empresa)
+        if form.is_valid():
+            form.save()
+            return redirect('portada')
+    else:
+        form = EmpresaForm(instance=empresa)
+    return render(request, 'editar_empresa.html', {'form': form})
+
+
+
+@login_required
+def registro_correspondencia(request, empresa_id):
+    try:
+        empresa = Empresa.objects.get(id=empresa_id)
+        perfil = PerfilUsuario.objects.get(user=request.user)
+        dependencias = perfil.dependencias.filter(empresa=empresa)
+    except (Empresa.DoesNotExist, PerfilUsuario.DoesNotExist):
+        return redirect('portada')
+
+    if request.method == 'POST':
+        form = CorrespondenciaForm(request.POST, request.FILES, user=request.user, empresa_id=empresa_id)
         if form.is_valid():
             nueva_correspondencia = form.save(commit=False)
             nueva_correspondencia.user = request.user
 
-            # Manejo del documento
+             # Manejo del documento
             if 'documento' in request.FILES:
                 nueva_correspondencia.documento = request.FILES['documento']
 
@@ -80,106 +117,117 @@ def registro_correspondencia(request):
             nueva_correspondencia.consecutivo = consecutivo
 
             nueva_correspondencia.save()
-
+            
             # Mensaje de éxito
             from django.contrib import messages
             messages.success(request, "La correspondencia ha sido registrada con éxito.")
 
-            return redirect('registro_correspondencia')
+            return redirect('registro_correspondencia', empresa_id=empresa_id)
     else:
-        # Si la solicitud es GET, se muestra el formulario vacío
-        form = CorrespondenciaForm(user=request.user)
+        form = CorrespondenciaForm(user=request.user, empresa_id=empresa_id)
+        
 
-    # Obtener las correspondencias para mostrar en la lista
-    if request.user.is_superuser:
-        correspondencias = Correspondencia.objects.all().order_by('-fecha')
-    else:
-        correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa).order_by('-fecha')
+    correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa).order_by('-fecha')
 
-    # Retornar la respuesta asegurándote de que siempre haya un render
     return render(request, 'gestion/registro_correspondencia.html', {
         'form': form,
         'correspondencias': correspondencias,
-        'empresa': empresa
+        'empresa': empresa,
     })
 
 
-   
 # Vista para lista la correspondencia
-
+@login_required
 @user_passes_test(lambda u: u.is_superuser)
+
 def lista_correspondencia(request):
+    # Obtener todos los filtros del formulario GET
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    empresa_id = request.GET.get('empresa')
+    dependencia_id = request.GET.get('dependencia')
+    tipo_correspondencia = request.GET.get('tipo_correspondencia')
+    adjuntos = request.GET.get('adjuntos')
+
+    # Filtrar las correspondencias
     correspondencias = Correspondencia.objects.all()
+
+    if fecha_inicio:
+        correspondencias = correspondencias.filter(fecha__gte=fecha_inicio)
+    if fecha_fin:
+        correspondencias = correspondencias.filter(fecha__lte=fecha_fin)
+    if empresa_id:
+        correspondencias = correspondencias.filter(dependencia__empresa_id=empresa_id)
+    if dependencia_id:
+        correspondencias = correspondencias.filter(dependencia_id=dependencia_id)
+    if tipo_correspondencia:
+        correspondencias = correspondencias.filter(tipo_correspondencia=tipo_correspondencia)
+    if adjuntos:
+        correspondencias = correspondencias.exclude(documento="")
+
+    # Crear el contexto de correspondencias con la URL del documento
     context = []
-
     for correspondencia in correspondencias:
-        # Verificar si la correspondencia tiene un documento asociado
         if correspondencia.documento:
-            documento_url = correspondencia.documento.url  # Obtener URL si existe
+            documento_url = correspondencia.documento.url
         else:
-            documento_url = None  # Asignar None si no hay documento
-
+            documento_url = None
+        
         context.append({
             'correspondencia': correspondencia,
-            'documento_url': documento_url,  # Pasar la URL o None
+            'documento_url': documento_url,
         })
 
-    return render(request, 'lista_correspondencia.html', {'correspondencias': context})
+    # Obtener todas las empresas y dependencias para los filtros
+    empresas = Empresa.objects.all()
+    dependencias = Dependencia.objects.all()
+
+    # Retornar los datos filtrados y las empresas y dependencias para el formulario
+    return render(request, 'lista_correspondencia.html', {
+        'correspondencias': context,
+        'empresas': empresas,
+        'dependencias': dependencias,
+    })
 
 
-
+@login_required
+@login_required
 def responder_correspondencia(request, correspondencia_id):
     correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
 
     if request.method == 'POST':
-        form = RespuestaCorrespondenciaForm(request.POST, instance=correspondencia)
+        form = RespuestaCorrespondenciaForm(request.POST, request.FILES, instance=correspondencia)
         if form.is_valid():
             form.save()
-            return redirect('registro_correspondencia')  # Redirige a la lista de correspondencias
+            messages.success(request, 'Respuesta guardada con éxito.')
+            return redirect('registro_correspondencia', empresa_id=correspondencia.dependencia.empresa.id)  # Redirige a la lista de correspondencias
     else:
         form = RespuestaCorrespondenciaForm(instance=correspondencia)
 
-    return render(request, 'gestion/responder_correspondencia.html', {'form': form, 'correspondencia': correspondencia})
+    return render(request, 'gestion/responder_correspondencia.html', {
+        'form': form,
+        'correspondencia': correspondencia
+    })
+
+
 
 
 @login_required
 def ver_respuesta(request, correspondencia_id):
     correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
 
+     # Obtener la empresa asociada a la dependencia de la correspondencia
+    empresa = correspondencia.dependencia.empresa
+
     # Solo permitir ver la respuesta si la correspondencia ha sido respondida
     if not correspondencia.respondida:
         messages.error(request, "Esta correspondencia aún no ha sido respondida.")
-        return redirect('registro_correspondencia')
-
-    return render(request, 'gestion/ver_respuesta.html', {'correspondencia': correspondencia})
-
-@user_passes_test(es_admin)
-def crear_usuario(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        empresa_id = request.POST.get('empresa')  # Obtener el ID de la empresa seleccionada
-
-        # Validar que el username y password no estén vacíos
-        if not username or not password:
-            return render(request, 'registro_usuario.html', {
-                'empresas': Empresa.objects.all(),
-                'error': 'El nombre de usuario y la contraseña son obligatorios.'
-            })
-
-        # Crear el usuario
-        nuevo_usuario = User.objects.create_user(username=username, password=password)
-
-        # Asociar el usuario con la empresa
-        empresa = Empresa.objects.get(id=empresa_id)
-        perfil = PerfilUsuario(user=nuevo_usuario, empresa=empresa)
-        perfil.save()
-     
-        return redirect('portada')  # Redirige a la portada después de crear el usuario
-
-    # Pasar las empresas al contexto para usarlas en el formulario
-    empresas = Empresa.objects.all()
-    return render(request, 'registro_usuario.html', {'empresas': empresas})
+        return redirect('registro_correspondencia', empresa_id=empresa.id)
+    
+    return render(request, 'gestion/ver_respuesta.html', {
+        'correspondencia': correspondencia,
+        'empresa': empresa  # Pasar la empresa al contexto
+    })
 
 
 # Vista del index (registro de correspondencia)
@@ -187,7 +235,7 @@ def crear_usuario(request):
 def index(request):
     try:
         perfil_usuario = PerfilUsuario.objects.get(user=request.user)
-        empresa = perfil_usuario.empresa
+        empresa = perfil_usuario.empresas.first()  # Cambiado a empresas.first()
     except PerfilUsuario.DoesNotExist:
         # Redirigir o mostrar un mensaje si no existe el perfil
         return render(request, 'gestion/error.html', {
@@ -195,7 +243,7 @@ def index(request):
         })
 
     if request.method == 'POST':
-        form = CorrespondenciaForm(request.POST, request.FILES)
+        form = CorrespondenciaForm(request.POST, request.FILES, user=request.user, empresa_id=empresa.id if empresa else None)
         if form.is_valid():
             nueva_correspondencia = form.save(commit=False)
             # Generar el consecutivo basado en la empresa y dependencia
@@ -215,9 +263,9 @@ def index(request):
 
             return redirect('index')
     else:
-        form = CorrespondenciaForm()
+        form = CorrespondenciaForm(user=request.user, empresa_id=empresa.id if empresa else None)
 
-    correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa)
+    correspondencias = Correspondencia.objects.filter(dependencia__empresa=empresa).order_by('-fecha') if empresa else Correspondencia.objects.none()
 
     return render(request, 'gestion/index.html', {
         'form': form,
@@ -225,9 +273,10 @@ def index(request):
         'empresa': empresa
     })
 
+
 # Vista para crear dependencias (solo admin)
 @login_required
-@user_passes_test(es_admin)
+@user_passes_test(lambda u: u.is_superuser)
 def crear_dependencia(request):
     if request.method == 'POST':
         form = DependenciaForm(request.POST)
@@ -238,19 +287,50 @@ def crear_dependencia(request):
         form = DependenciaForm()
     return render(request, 'gestion/crear_dependencia.html', {'form': form})
 
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def editar_dependencia(request, dependencia_id):
+    dependencia = get_object_or_404(Dependencia, id=dependencia_id)
+    if request.method == 'POST':
+        form = DependenciaForm(request.POST, instance=dependencia)
+        if form.is_valid():
+            form.save()
+            return redirect('portada')
+    else:
+        form = DependenciaForm(instance=dependencia)
+    return render(request, 'editar_dependencia.html', {'form': form})
+
+
 # Vista para registrar usuario (solo admin)
 @login_required
-@user_passes_test(es_admin)
+@user_passes_test(lambda u: u.is_superuser)
 def registrar_usuario(request):
     if request.method == 'POST':
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('portada')  # Redirige a la página principal
+            return redirect('portada')  # Redirigir a la portada o donde quieras
+        else:
+            # En caso de errores, mostrar los errores en el formulario
+            messages.error(request, "Corrige los errores del formulario")
+      
     else:
         form = RegistroUsuarioForm()
 
     return render(request, 'registro_usuario.html', {'form': form})
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def editar_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    if request.method == 'POST':
+        form = EditarUsuarioForm(request.POST, instance=usuario)
+        if form.is_valid():
+            form.save()
+            return redirect('portada')  # Redirige a la página de inicio después de editar
+    else:
+        form = EditarUsuarioForm(instance=usuario)
+    return render(request, 'editar_usuario.html', {'form': form})
 
 
 
@@ -259,6 +339,13 @@ def adjuntar_documento(request, correspondencia_id):
     # Obtener la instancia de la correspondencia
     correspondencia = get_object_or_404(Correspondencia, id=correspondencia_id)
 
+    # Obtener el empresa_id desde la dependencia de la correspondencia
+    if correspondencia.dependencia and correspondencia.dependencia.empresa:
+        empresa = correspondencia.dependencia.empresa  # Obtener la empresa relacionada
+    else:
+        messages.error(request, 'No se pudo determinar la empresa asociada a esta correspondencia.')
+        return redirect('portada')  # Redirigir a la portada si no hay empresa asociada
+    
     if request.method == 'POST':
         form = DocumentoForm(request.POST, request.FILES, instance=correspondencia)
 
@@ -266,11 +353,13 @@ def adjuntar_documento(request, correspondencia_id):
             # Guardar solo el documento subido
             form.save()
             messages.success(request, 'Documento adjuntado con éxito.')
-            return redirect('registro_correspondencia')
+            return redirect('registro_correspondencia', empresa_id=empresa.id)  # Redirigir con el empresa_id correcto
     else:
         form = DocumentoForm(instance=correspondencia)
 
-    return render(request, 'gestion/adjuntar_documento.html', {'form': form, 'correspondencia': correspondencia})
+    # Pasar la empresa al contexto
+    return render(request, 'gestion/adjuntar_documento.html', {'form': form, 'correspondencia': correspondencia, 'empresa': empresa})
+
 
 
 
@@ -278,3 +367,95 @@ def adjuntar_documento(request, correspondencia_id):
 def logout_view(request):
     logout(request)
     return redirect('login')  # Redirigir a la página de portada o la que prefieras después de cerrar sesión
+
+
+@login_required
+def filtrar_dependencias_por_empresa(request):
+    empresas_ids = request.GET.getlist('empresas_ids[]')
+    
+    if empresas_ids:
+        # Filtrar dependencias asociadas a la empresa seleccionada
+        dependencias = Dependencia.objects.filter(empresa_id__in=empresas_ids).values('id', 'nombre', 'empresa__nombre')
+        return JsonResponse(list(dependencias), safe=False)
+    
+    return JsonResponse([], safe=False)
+
+
+# Vista para exportar a excel
+@login_required
+def exportar_excel(request):
+    form = FiltroCorrespondenciaForm(request.GET, user=request.user)
+
+    # Obtener las empresas y dependencias en función del usuario
+    empresas = form.fields['empresa'].queryset
+    dependencias = form.fields['dependencia'].queryset
+
+    # Filtrar correspondencias
+    correspondencias = Correspondencia.objects.all()
+
+    if form.is_valid():
+        # Aplicar filtros
+        if form.cleaned_data['fecha_inicio']:
+            correspondencias = correspondencias.filter(fecha__gte=form.cleaned_data['fecha_inicio'])
+        if form.cleaned_data['fecha_fin']:
+            correspondencias = correspondencias.filter(fecha__lte=form.cleaned_data['fecha_fin'])
+        if form.cleaned_data['empresa']:
+            correspondencias = correspondencias.filter(dependencia__empresa=form.cleaned_data['empresa'])
+        if form.cleaned_data['dependencia']:
+            correspondencias = correspondencias.filter(dependencia=form.cleaned_data['dependencia'])
+        if form.cleaned_data['tipo_correspondencia']:
+            correspondencias = correspondencias.filter(tipo_correspondencia=form.cleaned_data['tipo_correspondencia'])
+        if form.cleaned_data['adjuntos']:
+            correspondencias = correspondencias.exclude(documento="")
+
+    # Verificar si la consulta tiene datos
+    print(f"Correspondencias encontradas: {correspondencias.count()}")
+
+    if correspondencias.exists():
+        # Crear el archivo Excel
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Correspondencias"
+
+        # Escribir los encabezados
+        ws.append([
+            "Consecutivo", "Tipo", "Dependencia", "Entrada/Salida", "Fecha", "Asunto", "Remitente", "Destinatario", "Necesita Respuesta", "Estado de Respuesta", "Documento", "Usuario Registró" 
+        ])
+
+        # Escribir los datos
+        for correspondencia in correspondencias:
+            ws.append([
+                correspondencia.consecutivo,
+                correspondencia.tipo_correspondencia,
+                correspondencia.dependencia.nombre,
+                correspondencia.entrada_salida,
+                correspondencia.fecha,
+                correspondencia.asunto,
+                correspondencia.remitente,
+                correspondencia.destinatario,
+                "Sí" if correspondencia.necesita_respuesta else "No",
+                "Respondida" if correspondencia.respondida else "Pendiente",
+                "Sí" if correspondencia.documento else "No",
+                correspondencia.user.username 
+            ])
+
+        # Crear la respuesta HTTP con el archivo Excel
+        response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+        response['Content-Disposition'] = 'attachment; filename=correspondencias.xlsx'
+        wb.save(response)
+        
+        return response
+    else:
+        messages.error(request, "No se encontraron correspondencias para exportar.")
+        return redirect('lista_correspondencia')
+    
+    # Retornar la vista con los filtros
+    return render(request, 'lista_correspondencia.html', {
+        'form': form,
+        'empresas': empresas,
+        'dependencias': dependencias,
+        'correspondencias': correspondencias,
+    })
+
+def error_view(request):
+    return render(request, 'gestion/error.html', {"message": "Ha ocurrido un error"})

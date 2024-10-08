@@ -4,29 +4,113 @@
 
 {% block content %}
 <div class="container mt-5">
-    <h1>Bienvenido, {{ user.username }}</h1>
-
-    <!-- Mostrar el logo de la empresa -->
-    {% if empresa and empresa.logo %}
-        <div class="text-center mb-4">
-            <img src="{{ empresa.logo.url }}" alt="{{ empresa.nombre }} Logo" class="img-fluid">
+    <h1>Seleccione la Empresa para Registrar Correspondencia</h1>
+    
+    <!-- Formulario para seleccionar empresa -->
+    <form id="empresaForm">
+        <div class="form-group">
+            <label for="empresa">Empresas:</label>
+            <select name="empresa" id="empresa" class="form-control">
+                {% for empresa in empresas %}
+                    <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
+                {% endfor %}
+            </select>
         </div>
-    {% else %}
-        <p>No hay logo disponible para esta empresa.</p>
-    {% endif %}
-
-    <!-- Botones solo para superusuario -->
-    {% if user.is_superuser %}
-        <a href="{% url 'registrar_usuario' %}" class="btn btn-primary">Registrar Usuario</a>
-        <a href="{% url 'crear_dependencia' %}" class="btn btn-primary">Registrar Dependencia</a>
-        <a href="{% url 'crear_empresa' %}" class="btn btn-primary">Crear Empresa</a>
-        <a href="{% url 'lista_correspondencia' %}" class="btn btn-primary">Correspondencia</a>
-    {% endif %}
-
-    <!-- Todos los usuarios pueden ver el botón de registrar correspondencia -->
-    <a href="{% url 'registro_correspondencia' %}" class="btn btn-secondary mt-3">Registrar Correspondencia</a>
-
-    <!-- Cerrar sesión -->
-    <a href="{% url 'logout' %}" class="btn btn-danger mt-3">Cerrar Sesión</a>
+        <button type="button" id="continuarBtn" class="btn btn-primary mt-3">Continuar</button>
+    </form>
 </div>
+
+<!-- Barra de botones de acciones generales (Registrar usuario, dependencia, empresa, correspondencia) -->
+{% if user.is_superuser %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-start mb-4">
+        <a href="{% url 'registrar_usuario' %}" class="btn btn-primary me-2">Registrar Usuario</a>
+        <a href="{% url 'crear_dependencia' %}" class="btn btn-primary me-2">Registrar Dependencia</a>
+        <a href="{% url 'crear_empresa' %}" class="btn btn-primary me-2">Crear Empresa</a>
+        <a href="{% url 'lista_correspondencia' %}" class="btn btn-primary me-2">Correspondencia</a>
+    </div>
+
+    <!-- Acordeón para mostrar Usuarios, Empresas y Dependencias -->
+    <div class="accordion" id="accordionExample">
+        <!-- Usuarios -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingOne">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                    Usuarios
+                </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        {% for usuario in usuarios %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ usuario.username }}
+                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar Usuario</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empresas -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingTwo">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                    Empresas
+                </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        {% for empresa in empresas %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ empresa.nombre }}
+                                <a href="{% url 'editar_empresa' empresa.id %}" class="btn btn-warning btn-sm">Editar Empresa</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dependencias -->
+        <div class="accordion-item">
+            <h2 class="accordion-header" id="headingThree">
+                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                    Dependencias
+                </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+                <div class="accordion-body">
+                    <ul class="list-group">
+                        {% for dependencia in dependencias %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                {{ dependencia.nombre }}
+                                <a href="{% url 'editar_dependencia' dependencia.id %}" class="btn btn-warning btn-sm">Editar Dependencia</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Script para manejar el redireccionamiento -->
+<script>
+    document.getElementById("continuarBtn").addEventListener("click", function() {
+        console.log("Botón Continuar presionado");
+        var empresaId = document.getElementById("empresa").value;
+        console.log("Empresa seleccionada: " + empresaId);
+        if (empresaId) {
+            var url = "/registro_correspondencia/" + empresaId + "/";
+            console.log("Redirigiendo a: " + url);
+            window.location.href = url;
+        } else {
+            alert("Por favor, selecciona una empresa.");
+        }
+    });
+</script>
 {% endblock %}

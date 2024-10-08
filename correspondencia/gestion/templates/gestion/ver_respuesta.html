@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Ver Respuesta{% endblock %}
+{% block title %}Respuesta para la Correspondencia{% endblock %}
 
 {% block content %}
 <div class="container mt-5">
@@ -11,9 +11,20 @@
             <p><strong>Asunto:</strong> {{ correspondencia.asunto }}</p>
             <p><strong>Respuesta:</strong> {{ correspondencia.respuesta }}</p>
             <p><strong>Fecha de Respuesta:</strong> {{ correspondencia.fecha_respuesta }}</p>
+            
+            <!-- Mostrar enlace al documento adjunto si existe -->
+            {% if correspondencia.documento_respuesta %}
+            <p><strong>Documento Adjunto:</strong> 
+                <a href="{{ correspondencia.documento_respuesta.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                    <i class="fas fa-file-download"></i> Ver Documento
+                </a>
+            </p>
+            {% else %}
+            <p><strong>Documento Adjunto:</strong> No hay documento adjunto</p>
+            {% endif %}
         </div>
     </div>
 
-    <a href="{% url 'registro_correspondencia' %}" class="btn btn-secondary mt-3">Volver</a>
+    <a href="{% url 'registro_correspondencia' correspondencia.dependencia.empresa.id %}" class="btn btn-secondary mt-3">Volver</a>
 </div>
 {% endblock %}
