@@ -1,4 +1,5 @@
 import openpyxl
+from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -9,6 +10,7 @@ from .forms import DocumentoForm, EditarUsuarioForm, RegistroUsuarioForm, Corres
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Count, Q
+from datetime import timedelta
 
 
 # Vista de la página principal (portada)
@@ -102,7 +104,7 @@ def registro_correspondencia(request, empresa_id):
             nueva_correspondencia = form.save(commit=False)
             nueva_correspondencia.user = request.user
 
-             # Manejo del documento
+            # Manejo del documento
             if 'documento' in request.FILES:
                 nueva_correspondencia.documento = request.FILES['documento']
 
@@ -310,11 +312,11 @@ def registrar_usuario(request):
         form = RegistroUsuarioForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('portada')  # Redirigir a la portada o donde quieras
+            messages.success(request, "Usuario creado exitosamente.")
+            return redirect('portada')  # Redirigir a la página que prefieras después de crear el usuario
         else:
-            # En caso de errores, mostrar los errores en el formulario
-            messages.error(request, "Corrige los errores del formulario")
-      
+            messages.error(request, "Corrige los errores del formulario.")
+            print(form.errors)  # Para depurar los errores en la consola
     else:
         form = RegistroUsuarioForm()
 
@@ -459,6 +461,7 @@ def exportar_excel(request):
     })
 
 
+
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def dashboard(request):
@@ -477,14 +480,37 @@ def dashboard(request):
     respondidas = correspondencias.filter(respondida=True).count()
     pendientes = correspondencias.filter(respondida=False).count()
 
+    # Filtrar correspondencias pendientes de respuesta
+    correspondencias_pendientes = Correspondencia.objects.filter(necesita_respuesta=True, respondida=False).order_by('fecha_limite_respuesta')
+
+    # Calcular días restantes y agregar al contexto
+    for correspondencia in correspondencias_pendientes:
+        if correspondencia.fecha_limite_respuesta:
+            # Convertir fecha_limite_respuesta a solo fecha (si es datetime)
+            fecha_limite = correspondencia.fecha_limite_respuesta.date() if isinstance(correspondencia.fecha_limite_respuesta, timezone.datetime) else correspondencia.fecha_limite_respuesta
+            correspondencia.dias_restantes = (fecha_limite - timezone.now().date()).days
+        else:
+            correspondencia.dias_restantes = None
+
     return render(request, 'gestion/dashboard.html', {
         'total_correspondencias': total_correspondencias,
         'empresas': empresas,
         'totales': totales,
         'respondidas': respondidas,
         'pendientes': pendientes,
+        'correspondencias_pendientes': correspondencias_pendientes,
     })
 
+
+@login_required
+def alertas_respuestas(request):
+    correspondencias_pendientes = Correspondencia.objects.filter(
+        necesita_respuesta=True,
+        respondida=False,
+        fecha_limite_respuesta__lte=timezone.now() + timedelta(days=3)  # Mostrar las que están por vencer en 3 días o menos
+    )
+    
+    return render(request, 'gestion/alertas_respuestas.html', {'correspondencias': correspondencias_pendientes})
 
 def error_view(request):
     return render(request, 'gestion/error.html', {"message": "Ha ocurrido un error"})

@@ -3,7 +3,7 @@ from django import forms
 from .models import Correspondencia, RespuestaCorrespondencia
 from django import forms
 from .models import PerfilUsuario, Empresa, Dependencia
-
+from datetime import timedelta
 class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
@@ -12,11 +12,27 @@ class EmpresaForm(forms.ModelForm):
 
 
 class CorrespondenciaForm(forms.ModelForm):
+    dias_para_responder = forms.IntegerField(
+        required=False,
+        label="Días para responder", 
+        help_text="Define cuántos días tiene el usuario para responder."
+    )
+
     fecha = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
 
     class Meta:
         model = Correspondencia
-        fields = ['tipo_correspondencia', 'dependencia', 'entrada_salida', 'fecha', 'documento', 'asunto', 'remitente', 'destinatario', 'necesita_respuesta']
+        fields = [
+            'tipo_correspondencia',
+            'dependencia',
+            'entrada_salida', 
+            'fecha', 
+            'documento', 
+            'asunto', 
+            'remitente', 
+            'destinatario', 
+            'necesita_respuesta', 
+            'dias_para_responder']
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
@@ -49,6 +65,20 @@ class CorrespondenciaForm(forms.ModelForm):
         # Aplicar clases de Bootstrap a los widgets del formulario
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+
+    def save(self, commit=True):
+        correspondencia = super().save(commit=False)
+
+        # Si se proporcionaron días para responder y la correspondencia necesita respuesta
+        if self.cleaned_data.get('dias_para_responder') and self.cleaned_data.get('necesita_respuesta'):
+            dias = self.cleaned_data['dias_para_responder']
+            # Calcular la fecha límite de respuesta sumando los días a la fecha actual
+            correspondencia.fecha_limite_respuesta = correspondencia.fecha + timedelta(days=dias)
+
+        if commit:
+            correspondencia.save()
+
+        return correspondencia       
 
 
 
@@ -88,7 +118,7 @@ class RegistroUsuarioForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     empresas = forms.ModelMultipleChoiceField(
         queryset=Empresa.objects.all(),
-        widget=forms.SelectMultiple,  # SelectMultiple para permitir la selección múltiple
+        widget=forms.SelectMultiple,
         required=True,
         label="Empresas"
     )
@@ -107,10 +137,10 @@ class RegistroUsuarioForm(forms.ModelForm):
         super(RegistroUsuarioForm, self).__init__(*args, **kwargs)
         if 'empresas' in self.data:
             try:
-                empresas_ids = self.data.getlist('empresas')
+                empresas_ids = self.data.getlist('empresas')  # Verifica el nombre del campo 'empresas'
                 self.fields['dependencias'].queryset = Dependencia.objects.filter(empresa_id__in=empresas_ids)
             except (ValueError, TypeError):
-                pass
+                self.fields['dependencias'].queryset = Dependencia.objects.none()
         elif self.instance.pk:
             self.fields['dependencias'].queryset = self.instance.perfilusuario.dependencias.all()
 
@@ -119,12 +149,13 @@ class RegistroUsuarioForm(forms.ModelForm):
         user.set_password(self.cleaned_data['password'])
         if commit:
             user.save()
-            perfil = PerfilUsuario.objects.create(user=user)
+            perfil, created = PerfilUsuario.objects.get_or_create(user=user)
             perfil.empresas.set(self.cleaned_data['empresas'])
             perfil.dependencias.set(self.cleaned_data['dependencias'])
             perfil.save()
         return user
-    
+
+
 class EditarUsuarioForm(forms.ModelForm):
     class Meta:
         model = User

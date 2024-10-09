@@ -7,7 +7,7 @@
     <h2>Crear Usuario</h2>
     <form method="post" class="form">
         {% csrf_token %}
-
+        
         <div class="form-group">
             <label for="username">Nombre de Usuario:</label>
             {{ form.username }}
@@ -21,7 +21,7 @@
         <!-- Campo de Empresas -->
         <div class="form-group">
             <label for="id_empresas">Empresas:</label>
-            <select id="id_empresas" name="empresas[]" class="form-control" multiple>
+            <select id="id_empresas" name="empresas" class="form-control" multiple>
                 {% for empresa in form.empresas.field.queryset %}
                     <option value="{{ empresa.id }}">{{ empresa.nombre }}</option>
                 {% endfor %}
@@ -37,20 +37,17 @@
     </form>
 
     <a href="{% url 'portada' %}" class="btn btn-secondary mt-3">Volver a la Portada</a>
-    
-
 
     {% if error %}
         <div class="alert alert-danger mt-3">{{ error }}</div>
     {% endif %}
 </div>
 
-    <!-- Script para manejar la carga dinámica de dependencias -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- Script para manejar la carga dinámica de dependencias -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <script>
-
-$(document).ready(function() {
+<script>
+    $(document).ready(function() {
     $('#id_empresas').change(function() {
         var empresasIds = $(this).val();
 
@@ -97,8 +94,6 @@ $(document).ready(function() {
     });
 });
 
-
-       
-    </script>   
+</script>
 
 {% endblock %}

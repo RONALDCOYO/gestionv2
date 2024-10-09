@@ -92,6 +92,12 @@
                         {{ form.necesita_respuesta|add_class:"form-control" }}
                     </div>
 
+                    <!-- Campo de "días para responder" que se mostrará solo si se selecciona "Necesita respuesta" -->
+                    <div id="dias-para-responder-container" class="form-group" style="display: none;">
+                        <label for="id_dias_para_responder">Días para responder:</label>
+                        {{ form.dias_para_responder|add_class:"form-control" }}
+                    </div>
+
                     <!-- Mostrar errores no relacionados a campos individuales -->
                     {% if form.non_field_errors %}
                         <div class="alert alert-danger">
@@ -103,6 +109,30 @@
                 </form>
             </div>
         </div>
+
+        <!-- JavaScript para manejar la visibilidad del campo "Días para Responder" -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Inicialmente, si la opción "Necesita respuesta" está seleccionada, mostrar el campo de días
+                toggleDiasParaResponder();
+
+                // Al cambiar la selección de "Necesita respuesta", mostrar u ocultar el campo de días
+                $('#id_necesita_respuesta').change(function() {
+                    toggleDiasParaResponder();
+                });
+
+                function toggleDiasParaResponder() {
+                    var necesitaRespuesta = $('#id_necesita_respuesta').is(':checked');
+                    if (necesitaRespuesta) {
+                        $('#dias-para-responder-container').show(); // Mostrar campo de días
+                    } else {
+                        $('#dias-para-responder-container').hide(); // Ocultar campo de días
+                        $('#id_dias_para_responder').val(''); // Limpiar valor si no se requiere respuesta
+                    }
+                }
+            });
+        </script>
 
         <!-- Formulario para filtros y exportar a Excel -->
         <form method="get" action="{% url 'exportar_excel' %}" class="mb-4">
@@ -170,6 +200,7 @@
                     <th>Remitente</th>
                     <th>Destinatario</th>
                     <th>Necesita Respuesta</th>
+                    <th>Fecha Límite de Respuesta</th>
                     <th>Estado de Respuesta</th>
                     <th>Respuesta</th>
                 </tr>
@@ -193,6 +224,7 @@
                         <td>{{ correspondencia.remitente }}</td>
                         <td>{{ correspondencia.destinatario }}</td>
                         <td>{{ correspondencia.necesita_respuesta|yesno:"Sí,No" }}</td>
+                        <td>{{ correspondencia.fecha_limite_respuesta }}</td>
                         <td>
                             {% if correspondencia.respondida %}
                                 Respondida el {{ correspondencia.fecha_respuesta }}
@@ -221,39 +253,5 @@
             <a href="{% url 'portada' %}" class="btn btn-secondary">Volver a la Portada</a>
         </div>
     </div>
-
-    <!-- JavaScript para validaciones -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const respuestaCheckbox = document.querySelector('#id_necesita_respuesta');
-            
-            if (respuestaCheckbox.checked) {
-                respuestaCheckbox.style.border = '2px solid red'; // Destacar en rojo si requiere respuesta
-                alert('Esta correspondencia necesita respuesta');
-            }
-        
-            respuestaCheckbox.addEventListener('change', function() {
-                if (respuestaCheckbox.checked) {
-                    respuestaCheckbox.style.border = '2px solid red';
-                } else {
-                    respuestaCheckbox.style.border = '';
-                }
-            });
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.querySelector('#id_documento');
-        
-            if (!fileInput.value) {
-                fileInput.style.border = '2px solid red'; // Destacar en rojo si no hay documento
-            }
-        
-            fileInput.addEventListener('change', function() {
-                if (fileInput.value) {
-                    fileInput.style.border = ''; // Quitar el borde una vez se selecciona un archivo
-                }
-            });
-        });
-    </script>
 </body>
 </html>

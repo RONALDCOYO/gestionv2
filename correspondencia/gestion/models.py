@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 
 
 
@@ -67,11 +68,17 @@ class Correspondencia(models.Model):
     remitente = models.CharField(max_length=255)
     destinatario = models.CharField(max_length=255)
     necesita_respuesta = models.BooleanField(default=False)
+    fecha_respuesta = models.DateTimeField(null=True, blank=True)
+    fecha_limite_respuesta = models.DateTimeField(null=True, blank=True) 
     respondida = models.BooleanField(default=False)  # Nuevo campo
     respuesta = models.TextField(blank=True, null=True)  # Campo para almacenar la respuesta
-    fecha_respuesta = models.DateTimeField(null=True, blank=True)  # Fecha de respuesta
     documento_respuesta = models.FileField(upload_to='respuestas/', null=True, blank=True)  # Campo para el documento de respuesta
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+
+    def calcular_fecha_limite_respuesta(self, dias_para_responder):
+        """Calcula y asigna la fecha límite basada en el número de días"""
+        self.fecha_limite_respuesta = self.fecha + timedelta(days=dias_para_responder)
+        self.save()
     
     def marcar_como_respondida(self, respuesta_texto):
         """Marca la correspondencia como respondida y almacena la respuesta"""

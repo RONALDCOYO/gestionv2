@@ -28,6 +28,46 @@
     </div>
 </div>
 
+<h3>Correspondencias Pendientes de Respuesta</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Consecutivo</th>
+            <th>Asunto</th>
+            <th>Fecha Límite</th>
+            <th>Días Restantes</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for correspondencia in correspondencias_pendientes %}
+            <tr class="{% if correspondencia.fecha_limite_respuesta and correspondencia.fecha_limite_respuesta < now %}table-danger{% else %}table-warning{% endif %}">
+                <td>{{ correspondencia.consecutivo }}</td>
+                <td>{{ correspondencia.asunto }}</td>
+                <td>
+                    {% if correspondencia.fecha_limite_respuesta %}
+                        {{ correspondencia.fecha_limite_respuesta }}
+                    {% else %}
+                        No aplica
+                    {% endif %}
+                </td>
+                <td>
+                    {% if correspondencia.dias_restantes is not None %}
+                        {{ correspondencia.dias_restantes }} días
+                    {% else %}
+                        No aplica
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">No hay correspondencias pendientes de respuesta.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+
 <!-- Scripts de Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
