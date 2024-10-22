@@ -18,14 +18,14 @@
 <body>
     <!-- Barra de navegación común (opcional) -->
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="#">Mi Aplicación</a>
+        <a class="navbar-brand" href="#">Control de Correspondencia y Consecutivos</a>
         <div class="collapse navbar-collapse">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     {% if empresa %}
                         <a class="nav-link" href="{% url 'registro_correspondencia' empresa.id %}">Correspondencia</a>
                     {% else %}
-                        <span class="nav-link text-muted">Sin Empresa Asociada</span>
+                        <span class="nav-link text-muted"></span>
                     {% endif %}
                 </li>
             </ul>
@@ -49,7 +49,7 @@
     <!-- Pie de página -->
     <footer class="footer mt-auto py-3 bg-light text-center">
         <div class="container">
-            <p class="text-muted">© 2024 Mi Aplicación</p>
+            <p class="text-muted">© 2024 DIT</p>
         </div>
     </footer>
 

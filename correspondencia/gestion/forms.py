@@ -4,6 +4,9 @@ from .models import Correspondencia, RespuestaCorrespondencia
 from django import forms
 from .models import PerfilUsuario, Empresa, Dependencia
 from datetime import timedelta
+
+
+
 class EmpresaForm(forms.ModelForm):
     class Meta:
         model = Empresa
@@ -113,6 +116,7 @@ class DependenciaForm(forms.ModelForm):
     class Meta:
         model = Dependencia
         fields = ['nombre', 'codigo', 'empresa']
+
 
 class RegistroUsuarioForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)

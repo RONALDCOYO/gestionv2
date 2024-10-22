@@ -41,7 +41,6 @@ class PerfilUsuario(models.Model):
 
 
 
-
     
 
 class Correspondencia(models.Model):
