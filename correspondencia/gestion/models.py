@@ -64,9 +64,6 @@ class Correspondencia(models.Model):
     entrada_salida = models.CharField(max_length=10, choices=ENTRADA_SALIDA)
     tipo_correspondencia = models.CharField(max_length=20, choices=TIPO_CORRESPONDENCIA)
     consecutivo = models.CharField(max_length=100, blank=True, null=True)
-    #numero_consecutivo = models.IntegerField(blank=True, null=True)  # Campo para el número secuencial
-    #consecutivo = models.IntegerField(blank=True, null=True)
-    #consecutivo = models.CharField(max_length=100)
     dependencia = models.ForeignKey(Dependencia, on_delete=models.CASCADE)
     fecha = models.DateField(null=False)
     documento = models.FileField(upload_to='correspondencias/', null=True, blank=True)

@@ -1,0 +1,20 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Consecutivo</th>
+            <th>Asunto</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for correspondencia in correspondencias %}
+        <tr>
+            <td>{{ correspondencia.consecutivo }}</td>
+            <td>{{ correspondencia.asunto }}</td>
+            <td>
+                <a href="{% url 'eliminar_correspondencia' correspondencia.id %}" class="btn btn-danger">Eliminar Correspondencia</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -26,5 +26,10 @@ urlpatterns = [
     path('editar_usuario/<int:usuario_id>/', views.editar_usuario, name='editar_usuario'),
     path('error/', views.error_view, name='error'),
     path('dashboard/', views.dashboard, name='dashboard'),
+    path('correspondencia/eliminar/<int:correspondencia_id>/', views.eliminar_correspondencia, name='eliminar_correspondencia'),
+    path('editar_correspondencia/<int:id>/', views.editar_correspondencia, name='editar_correspondencia'),
+    path('eliminar_correspondencia/<int:id>/', views.eliminar_correspondencia, name='eliminar_correspondencia'),
+    path('usuarios/eliminar/<int:usuario_id>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/cambiar_contraseña/<int:usuario_id>/', views.cambiar_contraseña_usuario, name='cambiar_contraseña_usuario'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
  

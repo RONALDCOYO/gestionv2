@@ -1,0 +1,21 @@
+<table class="table">
+    <thead>
+        <tr>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for usuario in usuarios %}
+        <tr>
+            <td>{{ usuario.username }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+                <a href="{% url 'cambiar_contraseña' usuario.id %}" class="btn btn-warning">Cambiar Contraseña</a>
+                <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger">Eliminar Usuario</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

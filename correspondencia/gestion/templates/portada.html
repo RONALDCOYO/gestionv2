@@ -47,7 +47,11 @@
                         {% for usuario in usuarios %}
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ usuario.username }}
-                                <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar Usuario</a>
+                                <div class="btn-group" role="group">
+                                    <a href="{% url 'editar_usuario' usuario.id %}" class="btn btn-warning btn-sm">Editar Usuario</a>
+                                    <a href="{% url 'cambiar_contraseña_usuario' usuario.id %}" class="btn btn-secondary btn-sm">Cambiar Contraseña</a>
+                                    <a href="{% url 'eliminar_usuario' usuario.id %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">Eliminar</a>
+                                </div>
                             </li>
                         {% endfor %}
                     </ul>
@@ -76,6 +80,31 @@
             </div>
         </div>
 
+        <!-- Correspondencia -->
+<div class="accordion-item">
+    <h2 class="accordion-header" id="headingFour">
+        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+            Correspondencia
+        </button>
+    </h2>
+    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+            <ul class="list-group">
+                {% for correspondencia in correspondencias %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ correspondencia.asunto }} - {{ correspondencia.consecutivo }}
+                        <div>
+                            <a href="{% url 'editar_correspondencia' correspondencia.id %}" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="{% url 'eliminar_correspondencia' correspondencia.id %}" class="btn btn-danger btn-sm">Eliminar</a>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item">No hay correspondencia disponible.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
         <!-- Dependencias -->
         <div class="accordion-item">
             <h2 class="accordion-header" id="headingThree">
@@ -100,6 +129,7 @@
 </div>
 {% endif %}
 
+
 <!-- Script para manejar el redireccionamiento -->
 <script>
     document.getElementById("continuarBtn").addEventListener("click", function() {
@@ -115,4 +145,5 @@
         }
     });
 </script>
+
 {% endblock %}

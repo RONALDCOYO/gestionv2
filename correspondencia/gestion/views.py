@@ -1,15 +1,17 @@
 import openpyxl
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
+from .models import Empresa, Dependencia, Correspondencia, PerfilUsuario, User
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth import login, authenticate, logout
+from django.contrib.auth import login, authenticate, logout, update_session_auth_hash
 from django.core.files.storage import default_storage
 from .models import Correspondencia, PerfilUsuario, Empresa, Dependencia
+from django.contrib.auth.forms import PasswordChangeForm
 from .forms import DocumentoForm, EditarUsuarioForm, RegistroUsuarioForm, CorrespondenciaForm, DependenciaForm, EmpresaForm, RespuestaCorrespondenciaForm, FiltroCorrespondenciaForm
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.db.models import Count, Q
+from django.db.models import Count
 from datetime import timedelta
 
 
@@ -37,14 +39,18 @@ def portada(request):
         usuarios = User.objects.all()  # Obtener todos los usuarios
         empresas = Empresa.objects.all()  # Obtener todas las empresas
         dependencias = Dependencia.objects.all()  # Obtener todas las dependencias
+        correspondencias = Correspondencia.objects.all()
     else:
         usuarios = None
+        correspondencias = Correspondencia.objects.filter(dependencia__in=dependencias)  # Correspondencias relacionadas con las dependencias del perfil
+
 
     # Renderizar la plantilla de la portada con los datos
     return render(request, 'portada.html', {
         'empresas': empresas,
         'dependencias': dependencias,
-        'usuarios': usuarios  # Pasar los usuarios si es superusuario
+        'usuarios': usuarios,  # Pasar los usuarios si es superusuario
+        'correspondencias': correspondencias  # Pasar las correspondencias en el contexto
     })
 
 
@@ -325,16 +331,15 @@ def registrar_usuario(request):
 @login_required
 @user_passes_test(lambda u: u.is_superuser)
 def editar_usuario(request, usuario_id):
-    usuario = get_object_or_404(User, id=usuario_id)
+    usuario = get_object_or_404(User, pk=usuario_id)
     if request.method == 'POST':
         form = EditarUsuarioForm(request.POST, instance=usuario)
         if form.is_valid():
             form.save()
-            return redirect('portada')  # Redirige a la página de inicio después de editar
+            return redirect('portada')  # Redirige a la portada o donde desees
     else:
         form = EditarUsuarioForm(instance=usuario)
     return render(request, 'editar_usuario.html', {'form': form})
-
 
 
 @login_required
@@ -514,3 +519,45 @@ def alertas_respuestas(request):
 
 def error_view(request):
     return render(request, 'gestion/error.html', {"message": "Ha ocurrido un error"})
+
+
+# Eliminar Usuario
+@login_required
+def eliminar_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    usuario.delete()
+    return redirect('portada')
+
+# Cambiar Contraseña
+@login_required
+def cambiar_contraseña_usuario(request, usuario_id):
+    usuario = get_object_or_404(User, id=usuario_id)
+    if request.method == 'POST':
+        form = PasswordChangeForm(user=usuario, data=request.POST)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request, form.user)
+            return redirect('portada')  # Ajusta según el nombre de la vista de portada
+    else:
+        form = PasswordChangeForm(user=usuario)
+    return render(request, 'cambiar_contraseña.html', {'form': form, 'usuario': usuario})
+
+
+@login_required
+def editar_correspondencia(request, id):
+    correspondencia = get_object_or_404(Correspondencia, id=id)
+    if request.method == "POST":
+        form = CorrespondenciaForm(request.POST, instance=correspondencia)
+        if form.is_valid():
+            form.save()
+            return redirect('lista_correspondencia')  # Redirige a la lista de correspondencia
+    else:
+        form = CorrespondenciaForm(instance=correspondencia)
+    return render(request, 'gestion/editar_correspondencia.html', {'form': form})
+
+# Eliminar Correspondencia
+@login_required
+def eliminar_correspondencia(request, id):
+    correspondencia = get_object_or_404(Correspondencia, id=id)
+    correspondencia.delete()
+    return redirect('lista_correspondencia')  # Redirige a la lista de correspondencia después de eliminar

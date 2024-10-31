@@ -161,10 +161,39 @@ class RegistroUsuarioForm(forms.ModelForm):
 
 
 class EditarUsuarioForm(forms.ModelForm):
+    empresas = forms.ModelMultipleChoiceField(
+        queryset=Empresa.objects.all(),
+        widget=forms.SelectMultiple,
+        required=True,
+        label="Empresas"
+    )
+    dependencias = forms.ModelMultipleChoiceField(
+        queryset=Dependencia.objects.all(),
+        widget=forms.SelectMultiple,
+        required=False,
+        label="Dependencias"
+    )
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name']  # Agrega más campos si es necesario
+        fields = ['username', 'email', 'first_name', 'last_name']
 
+    def __init__(self, *args, **kwargs):
+        super(EditarUsuarioForm, self).__init__(*args, **kwargs)
+        if self.instance.pk:  # Si el usuario ya existe
+            perfil = PerfilUsuario.objects.get(user=self.instance)
+            self.fields['empresas'].initial = perfil.empresas.all()
+            self.fields['dependencias'].initial = perfil.dependencias.all()
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        if commit:
+            user.save()
+            perfil, created = PerfilUsuario.objects.get_or_create(user=user)
+            perfil.empresas.set(self.cleaned_data['empresas'])
+            perfil.dependencias.set(self.cleaned_data['dependencias'])
+            perfil.save()
+        return user
 
     
 class FiltroCorrespondenciaForm(forms.Form):
